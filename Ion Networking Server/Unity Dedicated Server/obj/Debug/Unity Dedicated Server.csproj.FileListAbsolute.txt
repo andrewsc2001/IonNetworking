@@ -1,0 +1,7 @@
+C:\Users\techn\source\repos\Unity Dedicated Server\Unity Dedicated Server\bin\Debug\Unity Dedicated Server.exe.config
+C:\Users\techn\source\repos\Unity Dedicated Server\Unity Dedicated Server\bin\Debug\Unity Dedicated Server.exe
+C:\Users\techn\source\repos\Unity Dedicated Server\Unity Dedicated Server\bin\Debug\Unity Dedicated Server.pdb
+C:\Users\techn\source\repos\Unity Dedicated Server\Unity Dedicated Server\obj\Debug\Unity Dedicated Server.csprojAssemblyReference.cache
+C:\Users\techn\source\repos\Unity Dedicated Server\Unity Dedicated Server\obj\Debug\Unity Dedicated Server.csproj.CoreCompileInputs.cache
+C:\Users\techn\source\repos\Unity Dedicated Server\Unity Dedicated Server\obj\Debug\Unity Dedicated Server.exe
+C:\Users\techn\source\repos\Unity Dedicated Server\Unity Dedicated Server\obj\Debug\Unity Dedicated Server.pdb
