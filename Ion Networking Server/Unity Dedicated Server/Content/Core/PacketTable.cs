@@ -12,7 +12,7 @@ namespace IonServer.Content.Core
             PacketManager.AddPacket(PacketTable.ECHO, new PacketManager.PacketAction(PacketTable.Echo));
         }
     }
-
+    
     public static class PacketTable
     {
         //Echo packet
