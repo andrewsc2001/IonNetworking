@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Configuration;
-using IonServer.Networking.Content;
+using IonServer.Content.Core;
 
 namespace IonServer.Engine.Core.Networking
 {

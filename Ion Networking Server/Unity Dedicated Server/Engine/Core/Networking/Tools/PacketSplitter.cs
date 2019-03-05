@@ -1,4 +1,5 @@
-﻿namespace IonServer.Engine.Core.Networking.Tools
+﻿
+namespace IonServer.Engine.Core.Networking.Tools
 {
     class PacketSplitter
     {

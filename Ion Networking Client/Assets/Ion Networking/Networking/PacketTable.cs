@@ -1,7 +1,6 @@
 ﻿using System.Collections;
-using UnityEngine;
 
-namespace Techn_000.Networking
+namespace IonClient.Networking
 {
     public static class PacketTable
     {

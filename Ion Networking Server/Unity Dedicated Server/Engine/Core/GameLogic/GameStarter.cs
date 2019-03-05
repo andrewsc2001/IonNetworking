@@ -7,10 +7,12 @@ namespace IonServer.Engine.Core.GameLogic
 {
     public static class GameStarter
     {
+        private static bool isRunning = false;
+
         public static void Start()
         {
             Console.WriteLine("Starting Game Logic");
-            Game.isRunning = true;
+            isRunning = true;
 
             //Run the start function
             Game.Start();
@@ -44,7 +46,7 @@ namespace IonServer.Engine.Core.GameLogic
             long timeBetweenUpdates = 1000L/Game.UpdatesPerSecond;
 
             Stopwatch timer = new Stopwatch();
-            while (Game.isRunning)
+            while (isRunning)
             {
                 timeAtStart = Game.Time.ElapsedMilliseconds; //Records time at start of Update
                 
@@ -65,7 +67,7 @@ namespace IonServer.Engine.Core.GameLogic
         private static void StopUpdateLoop()
         {
             Console.WriteLine("Stopping Update Loop");
-            Game.isRunning = false;
+            isRunning = false;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace IonServer.Engine.Core.Networking.Tools
 {
@@ -84,7 +85,7 @@ namespace IonServer.Engine.Core.Networking.Tools
         //Read a string
         public string ReadString(int length)
         {
-            return BitConverter.ToString(ReadBytes(length * 2)); //Length * 2 because every character is two bytes
+            return Encoding.UTF8.GetString(ReadBytes(length * 2)); //Length * 2 because every character is two bytes
         }
         
         //Read a bool

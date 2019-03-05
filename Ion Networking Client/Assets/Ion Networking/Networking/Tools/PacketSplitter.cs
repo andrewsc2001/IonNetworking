@@ -1,8 +1,7 @@
-﻿namespace Techn_000.Networking
+﻿namespace IonClient.Networking.Tools
 {
     public static class PacketSplitter
     {
-
         public static byte[][] SplitBytes(byte[] data) //[packetnumber][data index] to reference a packet, loop through [packetnumber][i]
         {
             //All packets have a length in front of them. The length is the number of bytes in the ENTIRE PACKET, including the length byte

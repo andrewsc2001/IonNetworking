@@ -1,20 +1,27 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace Techn_000.Networking
+namespace IonClient.Networking
 {
-    class PacketHandler : MonoBehaviour
+    static class PacketHandler
     {
-        public static PacketHandler Instance;
+        private static List<byte[]> queue = new List<byte[]>();
 
-        private void Awake()
+        //Process all packets in the queue
+        public static void ProcessQueue()
         {
-            Instance = this;
+            lock (queue)
+            {
+                foreach (byte[] packet in queue)
+                {
+                    PacketHandler.HandleData(packet);
+                }
+                queue.Clear();
+            }
         }
 
-
-        List<byte[]> queue = new List<byte[]>();
-        public void AddToQueue(byte[] data)
+        //Add packet to queue
+        public static void AddToQueue(byte[] data)
         {
             lock (queue)
             {
@@ -22,20 +29,8 @@ namespace Techn_000.Networking
             }
         }
 
-        private void Update()
-        {
-            lock (queue)
-            {
-                foreach (byte[] packet in queue)
-                {
-                    HandleData(packet);
-                }
-                queue.Clear();
-            }
-        }
-
         //Take data and route it to the correct packet type to be processed.
-        public void HandleData(byte[] data)
+        public static void HandleData(byte[] data)
         {
             byte header = data[0]; //Header: first packet used for identifying the purpose of the packet.
 

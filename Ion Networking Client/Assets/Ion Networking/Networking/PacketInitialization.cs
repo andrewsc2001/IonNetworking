@@ -1,8 +1,6 @@
-﻿using System;
-using Techn_000.Networking;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Assets.Networking
+namespace IonClient.Networking
 {
     public static class PacketInitialization
     {

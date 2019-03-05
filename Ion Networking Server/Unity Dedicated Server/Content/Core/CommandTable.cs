@@ -9,45 +9,36 @@ namespace IonServer.Content.Core
         public static void Init()
         {
             Console.WriteLine("Initializing Console Commands");
-
-            CommandManager.AddCommand("echo", CommandTable.Echo);
+            
             CommandManager.AddCommand("quit", CommandTable.Quit);
             CommandManager.AddCommand("kick", CommandTable.Kick);
             CommandManager.AddCommand("listclients", CommandTable.ListClients);
-            CommandManager.AddCommand("test", CommandTable.Test);
         }
     }
 
     public static class CommandTable
     {
-        //Test command
-        public static void Test(string[] arguments)
-        {
-            Console.WriteLine("test");
-        }
-
-        //Echo command
-        public static void Echo(string[] arguments)
-        {
-            if(arguments.Length > 1)
-            {
-                for(int index = 1; index < arguments.Length; index++)
-                {
-                    Console.Write(arguments[index] + " ");
-                }
-                Console.WriteLine();
-            }
-        }
-        
         //Quit command
         public static void Quit(string[] arguments)
         {
+            if(arguments.Length > 1)
+            {
+                Console.WriteLine("Invalid arguments.");
+                return;
+            }
+
             Program.Shutdown();
         }
 
         //Kick command
         public static void Kick(string[] arguments)
         {
+            if (arguments.Length != 2)
+            {
+                Console.WriteLine("Invalid arguments.");
+                return;
+            }
+
             int index = -1;
             int.TryParse(arguments[1], out index);
 
@@ -71,6 +62,12 @@ namespace IonServer.Content.Core
         //List clients command
         public static void ListClients(string[] arguments)
         {
+            if (arguments.Length > 1)
+            {
+                Console.WriteLine("Invalid arguments.");
+                return;
+            }
+
             Console.WriteLine();
             Console.WriteLine("List of connected clients:");
 
