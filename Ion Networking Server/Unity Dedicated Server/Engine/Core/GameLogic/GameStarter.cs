@@ -39,27 +39,27 @@ namespace IonServer.Engine.Core.GameLogic
         //Starts the update loop for the game. This is where the _gameLogicThread will be occupied.
         private static void StartUpdateLoop()
         {
-            long timeAtStart;
-            long timeAtEnd;
-            long timeToWait;
-
             long timeBetweenUpdates = 1000L/Game.UpdatesPerSecond;
 
-            Stopwatch timer = new Stopwatch();
+            long nextUpdate = 0;
+            long now;
+            long delta;
+
             while (isRunning)
             {
-                timeAtStart = Game.Time.ElapsedMilliseconds; //Records time at start of Update
-                
-                //Latency from code below is accounted for,
-                Game.Update();
-                timeBetweenUpdates = 1000L / Game.UpdatesPerSecond; //Redefine timeBetweenUpdates every update so that it can be changed.
-                //Stop no latency zone
+                now = Game.Time.ElapsedMilliseconds;
+                delta = nextUpdate - now;
 
-                timeAtEnd = Game.Time.ElapsedMilliseconds; //Records time at end of Update
+                if (delta <= 0)
+                {
+                    nextUpdate = now + timeBetweenUpdates;
 
-                timeToWait = timeBetweenUpdates - (timeAtEnd - timeAtStart); //Subtracts the time it took to run Game.Update() from the normal interval between updates.
-                
-                Thread.Sleep((int)timeToWait);
+                    Game.Update();
+                }
+                else if (delta > 3)
+                {
+                    Thread.Sleep((int) delta - 3);
+                }
             }
         }
 

@@ -6,13 +6,6 @@ namespace IonServer.Engine.Core.Networking
 {
     public class Client
     {
-        /// <summary>
-        /// Handshake
-        /// SYN: (ACK, 0) Server -> Client
-        /// SYN/ACK: (ACK, 1) Client -> Server
-        /// ACK: (ACK, 2) Server -> Client
-        /// </summary>
-
         //Identifiers
         
         public byte index;
@@ -145,8 +138,6 @@ namespace IonServer.Engine.Core.Networking
                     return;
                 lock (_networkStream)
                 {
-                    
-
                     try
                     {
                         _tcpSocket.Close();
