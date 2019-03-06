@@ -1,7 +1,7 @@
 ﻿using IonServer.Engine.Core.Networking;
 using System;
 using System.Diagnostics;
-using System.Threading;
+using static Unity_Dedicated_Server.Content.Board;
 
 namespace IonServer.Content
 {
@@ -16,6 +16,8 @@ namespace IonServer.Content
 
         public static Client whiteClient;
         public static Client blackClient;
+        public static Team currentTurn; 
+
         public static bool allClientsConnected = false;
 
         //Run once at startup
@@ -25,7 +27,7 @@ namespace IonServer.Content
             whiteClient = NetworkManager.GetClientFromIndex(0);
             blackClient = NetworkManager.GetClientFromIndex(1);
 
-            
+            currentTurn = Team.White;
         }
 
         //Run once at shutdown
