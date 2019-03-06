@@ -55,6 +55,16 @@ namespace IonServer.Engine.Core.Networking
             return;
         }
 
+        //Returns the connection status of a client. No locks needed because no edits are being made.
+        public bool IsConnected()
+        {
+            if (_tcpSocket == null)
+                return false;
+            if (_tcpSocket.Connected)
+                return true;
+            return false;
+        }
+
         //////////////////////////Networking/Async Methods
 
         private void OnRecieveData(IAsyncResult result)

@@ -1,0 +1,16 @@
+Unity Multiplayer Package
+
+Ion Networking Engine
+
+Features:
+	(Both) Networking layer that handles packets and allows for easy expansion
+	(Server) Async packet handling
+	(Server) Multithreaded support with provided game logic thread.
+	(Server) Command line that allows for easy expansion
+	
+TODO:
+	Game Logic Thread
+	Shutdown function
+	
+NOTES:
+	Move maxplayers from NetworkManager to Game. Add enable/disable feature to loading it from config. Add isConnected() method to Client

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IonServer.Engine.Core.Networking;
+using System;
 using System.Diagnostics;
 using System.Threading;
 
@@ -8,14 +9,23 @@ namespace IonServer.Content
     {
         //Settings
         public static int UpdatesPerSecond = 10;
+        public static byte MaxPlayers = 2;
 
         public static bool isRunning = false;
         public static Stopwatch Time;
-        
+
+        public static Client whiteClient;
+        public static Client blackClient;
+        public static bool allClientsConnected = false;
+
         //Run once at startup
         public static void Start()
         {
-            Console.WriteLine("Hello, world!");
+            Console.WriteLine("Starting Game Logic");
+            whiteClient = NetworkManager.GetClientFromIndex(0);
+            blackClient = NetworkManager.GetClientFromIndex(1);
+
+            
         }
 
         //Run once at shutdown
@@ -27,7 +37,15 @@ namespace IonServer.Content
         //Game Loop
         public static void Update()
         {
-            
+            //Waiting for connections
+            if (!allClientsConnected)
+            {
+                if(whiteClient.IsConnected() && blackClient.IsConnected())
+                {
+                    allClientsConnected = true;
+                }
+                return;
+            }
         }
     }
 }

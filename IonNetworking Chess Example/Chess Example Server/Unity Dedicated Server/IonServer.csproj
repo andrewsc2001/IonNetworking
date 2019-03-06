@@ -45,8 +45,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Content\Board.cs" />
     <Compile Include="Content\Core\CoreManager.cs" />
     <Compile Include="Content\Initializer.cs" />
+    <Compile Include="Content\PacketTable.cs" />
+    <Compile Include="Content\Piece.cs" />
     <Compile Include="Engine\Core\CommandLine\CommandManager.cs" />
     <Compile Include="Content\Core\CommandTable.cs" />
     <Compile Include="Content\Game.cs" />

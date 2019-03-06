@@ -7,9 +7,9 @@ namespace IonServer.Content.Core
     {
         public static void Init()
         {
-            Console.WriteLine("Initializing Packet Table");
+            Console.WriteLine("Initializing Core Packet Table");
 
-            PacketManager.AddPacket(ECHO, new PacketManager.PacketAction(Echo));
+            PacketManager.AddPacket(ECHO, Echo);
         }
 
         //Echo packet
