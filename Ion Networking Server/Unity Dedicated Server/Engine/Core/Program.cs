@@ -41,7 +41,7 @@ namespace IonServer
 
                 string[] arguments = rawInput.Split(' '); //Split the raw text into arguments.                
 
-                CommandManager.HandleArguments(arguments);
+                CommandManager.QueueCommand(arguments);
             }
 
             Console.WriteLine("Exited Command Loop");

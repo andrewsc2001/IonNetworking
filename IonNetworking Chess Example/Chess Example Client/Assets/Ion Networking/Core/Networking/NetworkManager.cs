@@ -1,5 +1,4 @@
-﻿using Assets.Scripts.Networking;
-using IonClient.Core.Networking.Tools;
+﻿using IonClient.Core.Networking.Tools;
 using System;
 using System.IO;
 using System.Net.Sockets;
@@ -9,10 +8,6 @@ namespace IonClient.Core.Networking
 {
     public static class NetworkManager
     {
-        //Server settings
-        public static readonly string ServerIP = "127.0.0.1";
-        public static readonly int Port = 35565;
-
         //Instanced variables
         public static bool isConnected;
 
@@ -23,8 +18,7 @@ namespace IonClient.Core.Networking
         private static StreamWriter _streamWriter;
 
         private static byte[] asyncBuff;
-
-
+        
         public static void Init()
         {
             Debug.Log("Initializing NetworkManager...");
@@ -47,7 +41,6 @@ namespace IonClient.Core.Networking
 
         public static void Connect(string IP, int PORT)
         {
-
             if (_tcpSocket.Connected || isConnected)
             {
                 Debug.LogError("Already connected!");

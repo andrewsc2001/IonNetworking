@@ -57,13 +57,27 @@ namespace IonServer.Engine.Core.Networking
 
         //////////////////////////Networking/Async Methods
 
+            /*
         private void OnRecieveData(IAsyncResult result)
         {
             try
             {
+
+            }
+            catch(Exception e)
+            {
                 
+            }
+        }*/
+        
+        private void OnRecieveData(IAsyncResult result)
+        {
+            try
+            {
                 if (_tcpSocket == null)
                     return;
+
+                
 
                 byte[] RawData = null;
                 lock (_tcpSocket)
@@ -74,7 +88,8 @@ namespace IonServer.Engine.Core.Networking
 
                     lock (_networkStream)
                     {
-
+                        if (!_tcpSocket.Connected)
+                            return;
                         int readBytes = _networkStream.EndRead(result);
 
 
@@ -101,7 +116,7 @@ namespace IonServer.Engine.Core.Networking
                 //Add all packets to queue.
                 for (int index = 0; index < SplitData.Length; index++)
                 {
-                    PacketHandler.HandleData(this, SplitData[index]);
+                    PacketHandler.QueuePacket(this, SplitData[index]);
                 }         
             }
             catch (Exception e)

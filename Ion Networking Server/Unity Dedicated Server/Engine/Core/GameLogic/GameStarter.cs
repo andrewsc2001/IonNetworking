@@ -1,4 +1,6 @@
 ﻿using IonServer.Content;
+using IonServer.Engine.Core.CommandLine;
+using IonServer.Engine.Core.Networking;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -53,6 +55,10 @@ namespace IonServer.Engine.Core.GameLogic
                 if (delta <= 0)
                 {
                     nextUpdate = now + timeBetweenUpdates;
+
+                    //Process commands and packets before the game update.
+                    CommandManager.HandleQueue();
+                    PacketHandler.HandleQueue();
 
                     Game.Update();
                 }

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
-public class CameraControl : MonoBehaviour {
+public class CameraControl : MonoBehaviour
+{
 
     //The GameObject the script is controlling
     public GameObject target = null;

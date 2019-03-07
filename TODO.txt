@@ -1,0 +1,19 @@
+Variables:
+	IP
+	bitrate
+	buffer sizes
+	port
+	
+Functions:
+	Open/close connection
+	Read
+	isBufferFull/Empty
+	Write more data than buffer
+	Flush (maybe?)
+	
+Events:
+	report errors in connections
+
+	
+Make server single threaded
+Fix reading and writing to streams
