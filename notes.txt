@@ -14,3 +14,9 @@ TODO:
 	
 NOTES:
 	Move maxplayers from NetworkManager to Game. Add enable/disable feature to loading it from config. Add isConnected() method to Client
+	Make client-side packet registration the same as server side
+	Make client-side namespace organizaton symmetrical to server
+	Change NetworkManager on client to not connect at launch.
+	Make client NetworkManager static
+	Add NetworkController
+	Add SetCursor Function to PacketReader

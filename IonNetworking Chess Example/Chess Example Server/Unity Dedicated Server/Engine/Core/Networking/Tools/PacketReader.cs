@@ -20,6 +20,11 @@ namespace IonServer.Engine.Core.Networking.Tools
             loadedPacket = null;
         }
 
+        //Sets the cursor
+        public void SetCursor(int cursor)
+        {
+            this.cursor = cursor;
+        }
         //////////////////////////Type reads
 
         //Read an sbyte

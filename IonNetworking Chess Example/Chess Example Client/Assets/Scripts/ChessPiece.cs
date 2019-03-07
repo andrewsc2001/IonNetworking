@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Assets.Scripts;
+using System.Collections.Generic;
 
 public class ChessPiece : MonoBehaviour
 {
@@ -13,11 +14,14 @@ public class ChessPiece : MonoBehaviour
         Pawn = 5
     }
 
-    private static readonly Vector2 offset = new Vector2(0.5f, 0.5f);
+    public static readonly List<ChessPiece> ChessPieces = new List<ChessPiece>();
 
+    private static readonly Vector2 offset = new Vector2(0.5f, 0.5f);
+    
     public GameObject target;
     public GlobalVariables.Team owner;
     public Type type;
+
 
     private void Start()
     {
@@ -33,6 +37,7 @@ public class ChessPiece : MonoBehaviour
         target.transform.localPosition = new Vector3(x + offset.x, target.transform.localPosition.y, z + offset.y);
     }
 
+    /*
     private bool isMoveLegal(int moveX, int moveZ)
     {
         int currentX = (int)(target.transform.localPosition.x - offset.x);
@@ -79,5 +84,5 @@ public class ChessPiece : MonoBehaviour
         }
 
         return false;
-    }
+    }*/
 }

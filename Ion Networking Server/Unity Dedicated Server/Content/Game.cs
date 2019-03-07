@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
 
 namespace IonServer.Content
 {
     public static class Game
     {
         //Settings
-        public static int UpdatesPerSecond = 10;
+        public static readonly byte MaxPlayers = 4;
+        public static readonly int UpdatesPerSecond = 10;
 
         public static bool isRunning = false;
         public static Stopwatch Time;
@@ -31,3 +31,4 @@ namespace IonServer.Content
         }
     }
 }
+ 

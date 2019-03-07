@@ -23,7 +23,6 @@ namespace IonServer.Content
         //Run once at startup
         public static void Start()
         {
-            Console.WriteLine("Starting Game Logic");
             whiteClient = NetworkManager.GetClientFromIndex(0);
             blackClient = NetworkManager.GetClientFromIndex(1);
 

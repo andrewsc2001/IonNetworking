@@ -181,7 +181,7 @@ namespace Unity_Dedicated_Server.Content
         }
 
         //Moves a piece
-        public static void MoveOrder(Client sender, int netID, int x, int y)
+        public static void MoveOrder(Client sender, byte netID, int x, int y)
         {
             Piece piece = GetPieceFromID(netID);
             if(piece == null)
@@ -204,7 +204,10 @@ namespace Unity_Dedicated_Server.Content
             }
 
             //Check if move is within the pieces possible moves (not counting 
-            
+
+
+
+            piece.MoveTo(x, y);
         }
 
         private static bool IsDeltaMoveLegal(Piece piece, int deltaX, int deltaY)
@@ -219,7 +222,12 @@ namespace Unity_Dedicated_Server.Content
                 case Role.King:
                     if (!(deltaX >= -1 && deltaX <= 1 && deltaY >= -1 && deltaY <= 1))
                         return false;
-                    break;
+                    //Danger check?
+
+                    return true;
+                case Role.Bishop:
+                    
+                    return true;
                 case Role.Rook:
                     if (!(deltaX == 0 || deltaY == 0))
                         return false;
@@ -233,12 +241,29 @@ namespace Unity_Dedicated_Server.Content
                     }
                     if (deltaX > 0)
                     {
-                        for (int index = deltaX + 1; index < 0; index++)
+                        for (int index = 0; index < deltaX - 1; index++)
                         {
                             if (GetPieceFromLocation(index, 0) != null)
                                 return false;
                         }
                     }
+                    if(deltaY < 0)
+                    {
+                        for (int index = deltaY + 1; index < 0; index++)
+                        {
+                            if (GetPieceFromLocation(0, index) != null)
+                                return false;
+                        }
+                    }
+                    if (deltaY > 0)
+                    {
+                        for (int index = 0; index < deltaY - 1; index++)
+                        {
+                            if (GetPieceFromLocation(0, index) != null)
+                                return false;
+                        }
+                    }
+                    return true;
             }
 
             return false;
@@ -248,8 +273,6 @@ namespace Unity_Dedicated_Server.Content
         {
             Piece atLocation = GetPieceFromLocation(x, y);
             if (atLocation == null) //Space is empty
-                return false;
-            if (atLocation.team != team) //Space has a piece, but it is an enemy (will attack)
                 return false;
             return true;
         }
@@ -281,7 +304,7 @@ namespace Unity_Dedicated_Server.Content
         }
 
         //returns a piece by NetID
-        public static Piece GetPieceFromID(int ID)
+        public static Piece GetPieceFromID(byte ID)
         {
             return (Piece)NetIDs[ID];
         }
@@ -295,15 +318,15 @@ namespace Unity_Dedicated_Server.Content
         }
 
         //Returns the next unused NetID up to 50. (50 should never be reached)
-        private static int GetEmptyID()
+        private static byte GetEmptyID()
         {
-            int maxID = 50;
-            for(int id = 0; id < maxID; id++)
+            byte maxID = 50;
+            for(byte id = 0; id < maxID; id++)
             {
                 if (NetIDs[id] != null)
                     return id;
             }
-            return -1;
+            return 1;
         }
     }
 }

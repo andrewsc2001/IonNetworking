@@ -2,13 +2,13 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Configuration;
+using IonServer.Content;
 
 namespace IonServer.Engine.Core.Networking
 {
-    class NetworkManager
+    public static class NetworkManager
     {
         //settings
-        public static byte MaxPlayers = 4; //NOTE: Byte means that there can only be 0-255 players.
         public static int Port = 35565;
 
         private static Client[] _clientsList;
@@ -36,7 +36,7 @@ namespace IonServer.Engine.Core.Networking
             StopListener();
 
             //Disconnect all clients
-            for (byte index = 0; index < MaxPlayers; index++)
+            for (byte index = 0; index < Game.MaxPlayers; index++)
             {
                 Client client = GetClientFromIndex(index);
                 
@@ -52,16 +52,15 @@ namespace IonServer.Engine.Core.Networking
         private static void LoadSettings()
         {
             Console.WriteLine("Loading config data for NetworkManager");
-
-            byte.TryParse(ConfigurationManager.AppSettings["maxplayers"], out MaxPlayers);
+            
             int.TryParse(ConfigurationManager.AppSettings["port"], out Port);
         }
            
         private static void InitClientSlots() //Initializes client slots so that they can be filled with connections.
         {
             Console.WriteLine("Initializing Client Objects");
-            _clientsList = new Client[MaxPlayers];
-            for (int i = 0; i < MaxPlayers; i++)
+            _clientsList = new Client[Game.MaxPlayers];
+            for (int i = 0; i < Game.MaxPlayers; i++)
             {
                 _clientsList[i] = new Client();
             }
@@ -88,7 +87,7 @@ namespace IonServer.Engine.Core.Networking
 
         public static Client GetClientFromEndPoint(IPEndPoint ep) //Used primarily by OnUDPRecieve to determine the sender.
         {
-            for (int i = 0; i < MaxPlayers; i++)
+            for (int i = 0; i < Game.MaxPlayers; i++)
             {
                 if (ep.Address.ToString() == _clientsList[i].ip)
                 {
@@ -103,7 +102,7 @@ namespace IonServer.Engine.Core.Networking
 
         public static Client GetClientFromIndex(byte Index)
         {
-            if (Index < 0 || Index > MaxPlayers)
+            if (Index < 0 || Index > Game.MaxPlayers)
                 return null;
 
             lock (_clientsList)
@@ -125,7 +124,7 @@ namespace IonServer.Engine.Core.Networking
             //Assign connection to client slot for proper handling.
             lock (_clientsList) //Get a lock on the clients list
             {
-                for (byte i = 0; i < MaxPlayers; i++)
+                for (byte i = 0; i < Game.MaxPlayers; i++)
                 {
                     if (_clientsList[i]._tcpSocket == null) //If client has no connection
                     {
