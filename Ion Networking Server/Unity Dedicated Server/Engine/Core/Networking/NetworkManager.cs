@@ -1,31 +1,34 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Configuration;
-using IonServer.Content;
 
 namespace IonServer.Engine.Core.Networking
 {
     public static class NetworkManager
     {
         //settings
-        public static int Port = 35565;
+        public static int Port { get; private set; }
+        public static byte MaxPlayers { get; private set; }
+        public static int ClientSocketRecieveBufferSize { get; private set; }
+        public static int ClientSocketSendBufferSize { get; private set; }
+        public static bool UseNoDelay { get; private set; }
 
         private static Client[] _clientsList;
 
         private static TcpListener _serverSocket;
 
-        public static void Start()
+        public static void Init()
         {
             //Networking
             Console.WriteLine("Initializing NetworkManager");
 
-            LoadSettings();
+            Port = 35565;
+            MaxPlayers = 4;
+            ClientSocketRecieveBufferSize = 4096;
+            ClientSocketSendBufferSize = 4096;
+            UseNoDelay = false;
 
             InitClientSlots();//Set up client slots so that connections can be passed off to client objects
-
-            StartListener();//Begin listening for incoming connections
-
         }
 
         public static void Stop()
@@ -36,11 +39,11 @@ namespace IonServer.Engine.Core.Networking
             StopListener();
 
             //Disconnect all clients
-            for (byte index = 0; index < Game.MaxPlayers; index++)
+            for (byte index = 0; index < MaxPlayers; index++)
             {
                 Client client = GetClientFromIndex(index);
                 
-                if(client._tcpSocket != null)
+                if(client.Connected)
                 {
                     client.CloseConnection();
                 }
@@ -48,48 +51,24 @@ namespace IonServer.Engine.Core.Networking
         }
 
         //////////////////Internal Methods
-
-        private static void LoadSettings()
-        {
-            Console.WriteLine("Loading config data for NetworkManager");
-            
-            int.TryParse(ConfigurationManager.AppSettings["port"], out Port);
-        }
-           
         private static void InitClientSlots() //Initializes client slots so that they can be filled with connections.
         {
             Console.WriteLine("Initializing Client Objects");
-            _clientsList = new Client[Game.MaxPlayers];
-            for (int i = 0; i < Game.MaxPlayers; i++)
+            _clientsList = new Client[MaxPlayers];
+            for (int i = 0; i < MaxPlayers; i++)
             {
                 _clientsList[i] = new Client();
             }
         }
 
-        private static void StartListener() //Starts _listener thread to wait for connections
-        {
-            Console.WriteLine("Starting ServerSocket");
-
-            _serverSocket = new TcpListener(IPAddress.Any, Port);
-            _serverSocket.Start();
-
-            _serverSocket.BeginAcceptTcpClient(OnClientConnect, null);
-        }
-
-        private static void StopListener() //Stops _listener so no NEW clients can connect
-        {
-            Console.WriteLine("Stopping ServerSocket");
-            _serverSocket.Stop();
-            _serverSocket = null;
-        }
-
         //////////////////Public Methods
 
+        //Returns a client by its endpoint
         public static Client GetClientFromEndPoint(IPEndPoint ep) //Used primarily by OnUDPRecieve to determine the sender.
         {
-            for (int i = 0; i < Game.MaxPlayers; i++)
+            for (int i = 0; i < MaxPlayers; i++)
             {
-                if (ep.Address.ToString() == _clientsList[i].ip)
+                if (ep.Address.ToString() == _clientsList[i].IP)
                 {
                     return _clientsList[i];
                 }
@@ -100,14 +79,100 @@ namespace IonServer.Engine.Core.Networking
             return null;
         }
 
+        //Returns a client object by its Index
         public static Client GetClientFromIndex(byte Index)
         {
-            if (Index < 0 || Index > Game.MaxPlayers)
+            if (Index < 0 || Index > MaxPlayers)
                 return null;
 
             lock (_clientsList)
             {
                 return _clientsList[Index];
+            }
+        }
+
+        //Starts listening for new connections
+        public static void StartListener() //Starts _listener thread to wait for connections
+        {
+            Console.WriteLine("Starting ServerSocket");
+
+            _serverSocket = new TcpListener(IPAddress.Any, Port);
+            _serverSocket.Start();
+
+            _serverSocket.BeginAcceptTcpClient(OnClientConnect, null);
+        }
+
+        //Stops listening for new connections
+        public static void StopListener() //Stops _listener so no NEW clients can connect
+        {
+            Console.WriteLine("Stopping ServerSocket");
+            _serverSocket.Stop();
+            _serverSocket = null;
+        }
+
+        //////////////////Change settings
+
+        //Changes the port that the server listens on
+        public static void SetPort(int port)
+        {
+            if(_serverSocket != null)//Server is already listening, can't change ports.
+            {
+                Console.Error.WriteLine("Cannot change port when server is listening for clients!");
+                return;
+            }
+
+            NetworkManager.Port = port;
+        }
+
+        //Changes the maximum number of players
+        public static void SetMaxPlayers(byte MaxPlayers)
+        {
+            if(_serverSocket != null)
+            {
+                Console.WriteLine("Cannot change the maximum number of players while the server is running!");
+                return;
+            }
+
+            NetworkManager.MaxPlayers = MaxPlayers;
+            InitClientSlots();
+        }
+
+        //Set the read buffer for clients
+        public static void SetClientSocketReceiveBufferSize(int size)
+        {
+            if (_serverSocket != null)
+            {
+                Console.WriteLine("Cannot change client read buffer size while the server is running!");
+                return;
+            }
+
+            for (int index = 0; index < MaxPlayers; index++)
+            {
+                _clientsList[index].UpdateConfiguration();
+            }
+        }
+
+        //Set the write buffer for clients
+        public static void SetClientSocketWriteBufferSize(int size)
+        {
+            if (_serverSocket != null)
+            {
+                Console.WriteLine("Cannot change client write buffer size while the server is running!");
+                return;
+            }
+
+            for (int index = 0; index < MaxPlayers; index++)
+            {
+                _clientsList[index].UpdateConfiguration();
+            }
+        }
+
+        //Set NoDelay for all clients
+        public static void SetUseNoDelay(bool NoDelay)
+        {
+            for(int index = 0; index < MaxPlayers; index++)
+            {
+                _clientsList[index].SetUseNoDelay(NoDelay);
             }
         }
 
@@ -124,19 +189,13 @@ namespace IonServer.Engine.Core.Networking
             //Assign connection to client slot for proper handling.
             lock (_clientsList) //Get a lock on the clients list
             {
-                for (byte i = 0; i < Game.MaxPlayers; i++)
+                for (byte i = 0; i < MaxPlayers; i++)
                 {
-                    if (_clientsList[i]._tcpSocket == null) //If client has no connection
+                    if (!_clientsList[i].Connected) //If client has no connection
                     {
-
-                        //Configure Client object
-                        _clientsList[i]._tcpSocket = client;
-                        _clientsList[i].index = i;
-                        _clientsList[i].ip = client.Client.RemoteEndPoint.ToString().Split(':')[0];
-                        Console.WriteLine("Incoming Connection from " + _clientsList[i].ip + " || Index: " + i);
-                        _clientsList[i].Start(); //Client has been configured and is ready to communicate.
-
-
+                        Console.WriteLine("Incoming Connection from " + _clientsList[i].IP + " || Index: " + i);
+                        _clientsList[i].Start(i, client.Client.RemoteEndPoint.ToString().Split(':')[0], UseNoDelay, client); //Client has been configured and is ready to communicate.
+                        
                         return; //Prevents a single connection from taking more than one Client.
                     }
                 }

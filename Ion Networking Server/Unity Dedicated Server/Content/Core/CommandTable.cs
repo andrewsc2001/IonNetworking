@@ -39,7 +39,7 @@ namespace IonServer.Content.Core
             int index = -1;
             int.TryParse(arguments[1], out index);
 
-            if (index < 0 || index >= Game.MaxPlayers)
+            if (index < 0 || index >= NetworkManager.MaxPlayers)
             {
                 Console.WriteLine("Client " + index + " is out of bounds.");
                 return;
@@ -70,22 +70,22 @@ namespace IonServer.Content.Core
 
             byte connectedClients = 0;
             
-            for(byte index = 0; index < Game.MaxPlayers; index++)
+            for(byte index = 0; index < NetworkManager.MaxPlayers; index++)
             {
                 Console.Write("    Client " + index + ": ");
 
-                if (NetworkManager.GetClientFromIndex(index)._tcpSocket == null)
-                {
-                    Console.WriteLine("OPEN");
-                }
-                else
+                if (NetworkManager.GetClientFromIndex(index).Connected)
                 {
                     Console.WriteLine("CONNECTED");
                     connectedClients++;
                 }
+                else
+                {
+                    Console.WriteLine("OPEN");
+                }
             }
             Console.WriteLine();
-            Console.WriteLine(connectedClients + " connected out of " + Game.MaxPlayers + " max.");
+            Console.WriteLine(connectedClients + " connected out of " + NetworkManager.MaxPlayers + " max.");
         }
     }
 }

@@ -45,7 +45,7 @@ namespace IonServer.Engine.Core.Networking
         private static void HandleData(Client client, byte[] data)
         {
             byte header = data[0]; //Header: first packet used for identifying the purpose of the packet.
-            data[0] = client.index;
+            data[0] = client.Index;
 
             //Get the function associated with the header from the PacketTable.
             PacketManager.PacketAction action = PacketManager.GetAction(header);

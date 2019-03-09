@@ -19,7 +19,7 @@ namespace IonServer.Content.Core
             Client client = NetworkManager.GetClientFromIndex(data[0]);
             data[0] = ECHO; //Set first byte back to the ECHO header.
 
-            Console.WriteLine("Received echo packet from client " + client.index);
+            Console.WriteLine("Received echo packet from client " + client.Index);
             
             //Send data back to client
             client.Send(data);

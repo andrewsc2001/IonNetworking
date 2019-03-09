@@ -17,9 +17,6 @@ namespace IonServer
         {
             //Initialize Content
             Initializer.Init();
-
-            //Start the NetworkManager. Will accept client connections past this point.
-            NetworkManager.Start();
             
             //Start Game Logic
             _gameLogicThread.Start();

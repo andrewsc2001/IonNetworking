@@ -8,118 +8,127 @@ namespace IonServer.Engine.Core.Networking
     {
         //Identifiers
         
-        public byte index;
-        public string ip;
+        public byte Index { get; private set; }
+        public string IP { get; private set; }
+        public bool Connected { get; private set; }
+        public bool UseNoDelay { get; private set; }
 
-        public TcpClient _tcpSocket;
+        private TcpClient _tcpSocket;
         private NetworkStream _networkStream;
         private byte[] _readBuffer;
 
-        public void Start()
+        public void Start(byte Index, string IP, bool UseNoDelay, TcpClient socket)
         {
-            Console.WriteLine(ip + " has been assigned to Index: " + index);
+            Connected = true;
+            Console.WriteLine(IP + " has been assigned to Index: " + Index);
 
-            ConfigureTCP();
+            this.Index = Index;
+            this.IP = IP;
+            this._tcpSocket = socket;
+
+            UpdateConfiguration();
+            BeginRead();
         }
 
         //////////////////////////Public Methods
 
         public void Send(byte[] data) //Send data over TCP
         {
-            if (_tcpSocket != null)
+            if(data.Length > NetworkManager.ClientSocketSendBufferSize)
             {
-                if (_tcpSocket.Connected)
-                {
-                    if (_networkStream != null)
-                    {
+                //Trying to send more than buffer size.
+            }
 
-                        byte length = (byte) (data.Length + 1);
-
-                        byte[] send = new byte[data.Length + 1];
-                        send[0] = length;
-                        for(int index = 0; index < data.Length; index ++)
-                        {
-                            send[index + 1] = data[index];
-                        }
-
-                        _networkStream.Write(send, 0, send.Length);
-                        return;
-                    }
-                    Console.WriteLine("Tried to send data to client:" + index + ", but the stream was null!");
-                    return;
-                }
-                Console.WriteLine("Tried to send data to client:" + index + ", but Socket is not connected!");
+            if (_tcpSocket == null)
+            {
+                Console.WriteLine("Tried to send data to client:" + Index + ", but Socket is null!");
                 return;
             }
-            Console.WriteLine("Tried to send data to client:" + index + ", but Socket is null!");
-            return;
+
+            if (!_tcpSocket.Connected)
+            {
+                Console.WriteLine("Tried to send data to client:" + Index + ", but Socket is not connected!");
+                return;
+            }
+
+            if (_networkStream == null)
+            {
+                Console.WriteLine("Tried to send data to client:" + Index + ", but the stream was null!");
+                return;
+            }
+
+            //Add length of packet to beginning of it. This allows the client to separate two packets if they get stuck together.
+            byte[] send = new byte[data.Length + 1];
+
+            send[0] = (byte)(data.Length + 1);
+            Buffer.BlockCopy(data, 0, send, 1, data.Length);
+
+            _networkStream.Write(send, 0, send.Length);
+        }
+
+        //Set whether the TCP socket will use a delay
+        public void SetUseNoDelay(bool NoDelay)
+        {
+            if (Connected)
+            {
+                _tcpSocket.NoDelay = NoDelay;
+            }
+        }
+
+        //Configures the TCP socket and other internal values based on the NetworkManager's settings.
+        public void UpdateConfiguration()
+        {
+            _tcpSocket.SendBufferSize = NetworkManager.ClientSocketSendBufferSize;
+            _tcpSocket.ReceiveBufferSize = NetworkManager.ClientSocketRecieveBufferSize;
+            _networkStream = _tcpSocket.GetStream();
+            Array.Resize(ref _readBuffer, _tcpSocket.ReceiveBufferSize);
         }
 
         //////////////////////////Networking/Async Methods
-
-            /*
-        private void OnRecieveData(IAsyncResult result)
-        {
-            try
-            {
-
-            }
-            catch(Exception e)
-            {
-                
-            }
-        }*/
         
         private void OnRecieveData(IAsyncResult result)
         {
             try
             {
+                //Where data will be stored in when pulled from the stream.
+                byte[] rawData;
+
                 if (_tcpSocket == null)
                     return;
-
-                
-
-                byte[] RawData = null;
                 lock (_tcpSocket)
                 {
-
                     if (_networkStream == null)
                         return;
-
                     lock (_networkStream)
                     {
-                        if (!_tcpSocket.Connected)
-                            return;
-                        int readBytes = _networkStream.EndRead(result);
+                        //Length of the data recieved in the stream
+                        int messageLength = _networkStream.EndRead(result);
 
-
-
-                        //if recieved no data, end connection.
-                        if (readBytes <= 0)
+                        //Disconnection, run CloseConnection
+                        if(messageLength == 0)
                         {
                             CloseConnection();
                             return;
                         }
 
-                        //Create new byte[] newBytes and copy contents of readBuff into it
+                        //Dump read into rawData
+                        rawData = new byte[messageLength];
+                        Buffer.BlockCopy(_readBuffer, 0, rawData, 0, messageLength);
 
-                        Array.Resize(ref RawData, readBytes);
-                        Buffer.BlockCopy(_readBuffer, 0, RawData, 0, readBytes);
-
-                        //Reset stream
-                        _networkStream.BeginRead(_readBuffer, 0, _tcpSocket.ReceiveBufferSize, OnRecieveData, null);
+                        //Start listening for data again
+                        BeginRead();
                     }
                 }
-                //Handle Bytes
+
                 //Split data into packets.
-                byte[][] SplitData = PacketSplitter.SplitBytes(RawData);
+                byte[][] SplitData = PacketSplitter.SplitBytes(rawData);
                 //Add all packets to queue.
                 for (int index = 0; index < SplitData.Length; index++)
                 {
                     PacketHandler.QueuePacket(this, SplitData[index]);
-                }         
+                }
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 Console.WriteLine(e.Message);
                 Console.WriteLine(e.StackTrace);
@@ -130,20 +139,19 @@ namespace IonServer.Engine.Core.Networking
 
         //////////////////////////Internal Methods
 
-        private void ConfigureTCP()
+        
+
+        //Shortens the BeginRead line.
+        private void BeginRead()
         {
-            _tcpSocket.SendBufferSize = 4096;
-            _tcpSocket.ReceiveBufferSize = 4096;
-            _networkStream = _tcpSocket.GetStream();
-            Array.Resize(ref _readBuffer, _tcpSocket.ReceiveBufferSize);
-            _networkStream.BeginRead(_readBuffer, 0, _tcpSocket.ReceiveBufferSize, OnRecieveData, null);
+            _networkStream.BeginRead(_readBuffer, 0, NetworkManager.ClientSocketRecieveBufferSize, OnRecieveData, null);
         }
 
         public void CloseConnection()
         {
             if (_tcpSocket == null)
             {
-                Console.WriteLine("Cannot disconnect client " + index + ", because it is not connected!");
+                Console.WriteLine("Cannot disconnect client " + Index + ", because it is not connected!");
                 return;
             }
             
@@ -161,18 +169,19 @@ namespace IonServer.Engine.Core.Networking
                     catch (Exception e)
                     {
                         Console.WriteLine(e.Message);
-                        Console.Error.WriteLine("Did not properly disconnect Client " + index + "!");
+                        Console.Error.WriteLine("Did not properly disconnect Client " + Index + "!");
                     }
 
 
                     _tcpSocket = null;
 
 
-                    Console.WriteLine("Client " + index + " disconnected.");
+                    Console.WriteLine("Client " + Index + " disconnected.");
 
-                    ip = null;
+                    IP = null;
                     _networkStream = null;
                     _readBuffer = null;
+                    Connected = false;
                 }
             }
         }
