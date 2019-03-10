@@ -5,14 +5,22 @@ namespace IonClient.Core
 {
     public class NetworkController : MonoBehaviour
     {
+        public static NetworkController Singleton;
+
         private void Awake()
         {
+            Singleton = this;
             NetworkManager.Init();
         }
 
         private void Update()
         {
             PacketHandler.ProcessQueue();
+        }
+
+        public void OnConnected()
+        {
+            Debug.Log("Connected!");
         }
     }
 }

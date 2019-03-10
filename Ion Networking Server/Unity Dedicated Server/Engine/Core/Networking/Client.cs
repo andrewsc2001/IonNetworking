@@ -1,5 +1,6 @@
 ﻿using IonServer.Engine.Core.Networking.Tools;
 using System;
+using System.Collections;
 using System.Net.Sockets;
 
 namespace IonServer.Engine.Core.Networking
@@ -28,6 +29,7 @@ namespace IonServer.Engine.Core.Networking
 
             UpdateConfiguration();
             BeginRead();
+            SendPacketTable();
         }
 
         //////////////////////////Public Methods
@@ -139,7 +141,30 @@ namespace IonServer.Engine.Core.Networking
 
         //////////////////////////Internal Methods
 
-        
+        //Sends the packet table to the client
+        private void SendPacketTable()
+        {
+            if (!PacketManager.Locked)
+            {
+                Console.WriteLine("Cannot send packet table to client " + Index + " until PacketManager has been locked!");
+                return;
+            }
+
+            PacketBuilder pb = new PacketBuilder("SyncPacketTable");
+
+            pb.Write((byte)(PacketManager._headersToNames.Count - 1)); //count - 1 because it will not send the data for SyncPacketTable.
+
+            foreach(DictionaryEntry pair in PacketManager._headersToNames)
+            {
+                if ((string)pair.Value == "SyncPacketTable") //SyncPacketTable is the only hard-coded packet type on the client. It doesnt need to be queued.
+                    continue;
+                pb.Write((byte)pair.Key);
+                pb.Write((string)pair.Value);
+            }
+
+            Console.WriteLine("Sending packet table to client " + Index);
+            Send(pb.GetPacket());
+        }
 
         //Shortens the BeginRead line.
         private void BeginRead()

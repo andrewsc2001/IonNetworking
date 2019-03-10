@@ -1,5 +1,6 @@
 ﻿using IonServer.Engine.Core.CommandLine;
 using IonServer.Engine.Core.Networking;
+using IonServer.Engine.Core.Networking.Tools;
 using System;
 
 namespace IonServer.Content.Core
@@ -13,6 +14,31 @@ namespace IonServer.Content.Core
             CommandManager.AddCommand("quit", Quit);
             CommandManager.AddCommand("kick", Kick);
             CommandManager.AddCommand("listclients", ListClients);
+            CommandManager.AddCommand("echo", Echo);
+        }
+        
+        //Echo command
+        public static void Echo(string[] arguments)
+        {
+            if(arguments.Length != 3)
+            {
+                Console.WriteLine("Invalid arguments.");
+                return;
+            }
+
+            byte clientID;
+            byte lifespan;
+
+            byte.TryParse(arguments[1], out clientID);
+            byte.TryParse(arguments[2], out lifespan);
+
+            Client client = NetworkManager.GetClientFromIndex(clientID);
+            PacketBuilder pb = new PacketBuilder("echo");
+            pb.Write(lifespan);
+
+            Console.WriteLine("Sending echo packet to client " + clientID + " with lifespan of " + lifespan);
+
+            client.Send(pb.GetPacket());
         }
 
         //Quit command

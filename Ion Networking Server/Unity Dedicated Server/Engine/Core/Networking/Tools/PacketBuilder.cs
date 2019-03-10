@@ -6,6 +6,15 @@ namespace IonServer.Engine.Core.Networking.Tools
     public class PacketBuilder
     {
         byte[] packet = new byte[0];
+        
+        //No initial settings
+        public PacketBuilder() { }
+
+        //Writes header
+        public PacketBuilder(string packetName)
+        {
+            Write(PacketManager.GetHeader(packetName));
+        }
 
         //Clears current packet
         public void Clear()
@@ -13,7 +22,7 @@ namespace IonServer.Engine.Core.Networking.Tools
             packet = new byte[0];
         }
 
-        //////////////////////////Tyoe write functions
+        //////////////////////////Type write functions
 
         //Writes an sbyte
         public void Write(sbyte data)
@@ -78,7 +87,9 @@ namespace IonServer.Engine.Core.Networking.Tools
         //Write a string
         public void Write(string data)
         {
-            Write(Encoding.UTF8.GetBytes(data));
+            byte[] send = Encoding.UTF8.GetBytes(data);
+            Write(send.Length);
+            Write(send);
         }
 
         //Write a bool
@@ -92,27 +103,18 @@ namespace IonServer.Engine.Core.Networking.Tools
         //Adds bytes to the end of the packet
         public void Write(byte[] bytes)
         {
-            byte[] newBytes = new byte[packet.Length + bytes.Length];
+            Array.Resize(ref packet, bytes.Length + packet.Length);
 
-            //add 'data' to front of newBytes
-            Buffer.BlockCopy(packet, 0, newBytes, 0, packet.Length);
-            //add 'bytes' after data
-            Buffer.BlockCopy(bytes, 0, newBytes, packet.Length, bytes.Length);
-
-            packet = newBytes;
+            Buffer.BlockCopy(bytes, 0, packet, packet.Length - bytes.Length, bytes.Length);
         } 
 
         //Adds bytes to the front of the packet (mostly for wrapping already made packets).
         public void WriteToFront(byte[] bytes)
         {
-            byte[] newBytes = new byte[packet.Length + bytes.Length];
+            Array.Resize(ref bytes, bytes.Length + packet.Length);
 
-            //add 'bytes' to front of newBytes
-            Buffer.BlockCopy(bytes, 0, newBytes, packet.Length, bytes.Length);
-            //add 'data' after bytes
-            Buffer.BlockCopy(packet, 0, newBytes, 0, packet.Length);
-
-            packet = newBytes;
+            Buffer.BlockCopy(packet, 0, bytes, bytes.Length - packet.Length, packet.Length);
+            packet = bytes;
         }
 
         //Writes a byte to the end of the packet

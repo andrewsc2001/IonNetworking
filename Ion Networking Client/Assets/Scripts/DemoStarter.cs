@@ -1,5 +1,4 @@
-﻿using Assets.Scripts.Networking;
-using IonClient.Core.Networking;
+﻿using IonClient.Core.Networking;
 using UnityEngine;
 
 public class DemoStarter : MonoBehaviour {
@@ -11,13 +10,8 @@ public class DemoStarter : MonoBehaviour {
     }
 
     // Update is called once per frame
-    bool hasSentEcho = false;
     void Update()
     {
-        if (NetworkManager.isConnected && !hasSentEcho)
-        {
-            NetworkManager.SendToServer(new byte[] { PacketTable.ECHO });
-            hasSentEcho = true;
-        }
+        
     }
 }

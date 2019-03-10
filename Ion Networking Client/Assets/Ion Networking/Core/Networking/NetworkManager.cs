@@ -77,6 +77,7 @@ namespace IonClient.Core.Networking
                     _networkStream = _tcpSocket.GetStream();
                     _networkStream.BeginRead(asyncBuff, 0, 8192, OnRecieve, null);
                     isConnected = true;
+                    NetworkController.Singleton.OnConnected();
                 }
             }
         }

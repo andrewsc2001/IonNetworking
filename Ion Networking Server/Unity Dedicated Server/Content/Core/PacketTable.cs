@@ -1,4 +1,5 @@
 ﻿using IonServer.Engine.Core.Networking;
+using IonServer.Engine.Core.Networking.Tools;
 using System;
 
 namespace IonServer.Content.Core
@@ -9,20 +10,28 @@ namespace IonServer.Content.Core
         {
             Console.WriteLine("Initializing Packet Table");
 
-            PacketManager.AddPacket(ECHO, new PacketManager.PacketAction(Echo));
+            PacketManager.AddPacket("SyncPacketTable", 0, Empty);
+            PacketManager.AddPacket("echo", new PacketManager.PacketAction(Echo));
         }
 
         //Echo packet
-        public static readonly byte ECHO = 0;
         public static void Echo(byte[] data)
         {
             Client client = NetworkManager.GetClientFromIndex(data[0]);
-            data[0] = ECHO; //Set first byte back to the ECHO header.
-
-            Console.WriteLine("Received echo packet from client " + client.Index);
             
-            //Send data back to client
-            client.Send(data);
+            Console.WriteLine("Received echo packet from client " + client.Index + " with a lifespan of " + data[1]);
+
+            data[0] = PacketManager.GetHeader("echo");
+
+            byte lifespan = data[1];
+            if (lifespan > 0)
+            {
+                data[1]--;
+                client.Send(data);
+            }
         }
+
+        //Does nothing. Used for packet types that are only sent from the server
+        public static void Empty(byte[] data) { }
     }
 }

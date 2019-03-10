@@ -5,15 +5,22 @@ namespace IonServer.Engine.Core.Networking.Tools
 {
     public class PacketReader
     {
-        private int cursor = 0; //The index the reader is at. All read commands start at the cursor and add to it as they read.
+        private int cursor = 1; //The index the reader is at. All read commands start at the cursor and add to it as they read.
         private byte[] loadedPacket = null;
+
+        public PacketReader() { }
+
+        public PacketReader(byte[] data)
+        {
+            LoadPacket(data);
+        }
 
         //Loads a packet into the reader
         public void LoadPacket(byte[] packet)
         {
             loadedPacket = packet;
         }
-        
+
         //Clears the current packet
         public void Clear()
         {
@@ -24,6 +31,14 @@ namespace IonServer.Engine.Core.Networking.Tools
         public void SetCursor(int cursor)
         {
             this.cursor = cursor;
+        }
+
+        //Returns the remaining bytes
+        public int GetRemainingLength()
+        {
+            if (loadedPacket == null)
+                return 0;
+            return loadedPacket.Length - cursor;
         }
 
         //////////////////////////Type reads
@@ -89,11 +104,13 @@ namespace IonServer.Engine.Core.Networking.Tools
         }
 
         //Read a string
-        public string ReadString(int length)
+        public string ReadString()
         {
-            return Encoding.UTF8.GetString(ReadBytes(length * 2)); //Length * 2 because every character is two bytes
+            int length = ReadInt();
+
+            return Encoding.UTF8.GetString(ReadBytes(length));
         }
-        
+
         //Read a bool
         public bool ReadBool()
         {
@@ -128,17 +145,15 @@ namespace IonServer.Engine.Core.Networking.Tools
         //Returns a byte[] read from the packet.
         public byte[] ReadBytes(int length)
         {
-            if(length <= 0)
+            if (length <= 0 || length > GetRemainingLength())
             {
                 Console.WriteLine("Length out of bounds!");
                 return null;
             }
 
             byte[] read = new byte[length];
-            for(int index = 0; index < length; index++)
-            {
-                read[index] = loadedPacket[index + cursor];
-            }
+
+            Buffer.BlockCopy(loadedPacket, cursor, read, 0, length);
 
             cursor += length;
             return read;

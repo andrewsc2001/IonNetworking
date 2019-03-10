@@ -94,6 +94,12 @@ namespace IonServer.Engine.Core.Networking
         //Starts listening for new connections
         public static void StartListener() //Starts _listener thread to wait for connections
         {
+            if (!PacketManager.Locked)
+            {
+                Console.WriteLine("Cannot start listener until PacketManager has been locked!");
+                return;
+            }
+
             Console.WriteLine("Starting ServerSocket");
 
             _serverSocket = new TcpListener(IPAddress.Any, Port);

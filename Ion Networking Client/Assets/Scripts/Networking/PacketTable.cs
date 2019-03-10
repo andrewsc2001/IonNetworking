@@ -1,5 +1,6 @@
 ﻿using IonClient.Core.Networking;
 using IonClient.Core.Networking.Tools;
+using System.Collections;
 using UnityEngine;
 
 namespace Assets.Scripts.Networking
@@ -10,32 +11,47 @@ namespace Assets.Scripts.Networking
         {
             Debug.Log("Initializing Packets");
 
-            PacketManager.AddPacket(ECHO, Echo);
-            PacketManager.AddPacket(MOVE, Move);
+            PacketManager.AddPacket("SyncPacketTable", 0, SyncPacketTable);
+            PacketManager.AddPacket("echo", Echo);
+        }
+
+        //Takes a packet table from the server and registers it to the local packet table
+        public static void SyncPacketTable(byte[] data)
+        {
+            Debug.Log("Received Packet Table from server");
+
+            Hashtable headersToNames = new Hashtable();
+
+            PacketReader pr = new PacketReader(data);
+            byte lenghtOfPacketTable = pr.ReadByte();
+
+            for (int i = 0; i < lenghtOfPacketTable; i++)
+            {
+                byte header = pr.ReadByte();
+                string name = pr.ReadString();
+
+                headersToNames.Add(header, name);
+            }
+
+            
+            PacketManager.Lock(headersToNames);
         }
 
         //Echo packet
-        public static readonly byte ECHO = 0;
         public static void Echo(byte[] data)
         {
-            Debug.Log("Received echo packet from server!");
+            
+
+            byte lifespan = data[1];
+            Debug.Log("Received echo packet from server with a lifespan of " + lifespan);
+
+            if (lifespan > 0)
+            {
+                data[1]--;
+                Debug.Log("Sending it back!");
+                NetworkManager.SendToServer(data);
+            }
         }
-
-        //Move packet
-        public static readonly byte MOVE = 1;
-        public static void Move(byte[] data)
-        {
-            PacketReader pr = new PacketReader();
-
-            pr.SetCursor(1); //Move the cursor past the header.
-
-            byte netID = pr.ReadByte();
-            int x = pr.ReadInt();
-            int y = pr.ReadInt();
-
-            pr.Clear();
-
-
-        }
+        
     }
 }
