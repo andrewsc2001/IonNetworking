@@ -1,13 +1,15 @@
 ﻿using IonServer.Engine.Core.Networking;
 using System;
 using System.Diagnostics;
+using System.Threading;
 
 namespace IonServer.Content
 {
     public static class Game
     {
         //Settings
-        public static readonly int UpdatesPerSecond = 10;
+        public static readonly int UpdatesPerSecond = 20;
+        public static readonly int AllottedPacketHandleTime = 10;
 
         public static bool isRunning = false;
         public static Stopwatch Time;
@@ -28,7 +30,7 @@ namespace IonServer.Content
         //Game Loop
         public static void Update()
         {
-            
+            Thread.Sleep(25);
         }
     }
 }

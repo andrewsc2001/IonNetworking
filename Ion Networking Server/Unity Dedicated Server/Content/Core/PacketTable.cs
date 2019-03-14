@@ -19,11 +19,16 @@ namespace IonServer.Content.Core
         {
             Client client = NetworkManager.GetClientFromIndex(data[0]);
             
-            Console.WriteLine("Received echo packet from client " + client.Index + " with a lifespan of " + data[1]);
 
             data[0] = PacketManager.GetHeader("echo");
 
             byte lifespan = data[1];
+
+            if(lifespan == 0)
+            {
+                Console.Write("Finished echo");
+            }
+
             if (lifespan > 0)
             {
                 data[1]--;

@@ -7,6 +7,8 @@ namespace IonServer.Content
     {
         public static void Init()
         {
+            NetworkManager.Init();
+
             CoreManager.Init();
 
             PacketManager.Lock();

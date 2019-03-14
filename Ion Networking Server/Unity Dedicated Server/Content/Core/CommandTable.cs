@@ -33,6 +33,7 @@ namespace IonServer.Content.Core
             byte.TryParse(arguments[2], out lifespan);
 
             Client client = NetworkManager.GetClientFromIndex(clientID);
+
             PacketBuilder pb = new PacketBuilder("echo");
             pb.Write(lifespan);
 

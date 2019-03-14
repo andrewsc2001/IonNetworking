@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace IonServer.Engine.Core.Networking
 {
@@ -17,18 +19,19 @@ namespace IonServer.Engine.Core.Networking
             }
         }
 
-        private static readonly List<Packet> queue = new List<Packet>();
+        //private static readonly List<Packet> queue = new List<Packet>();
+        private static ConcurrentQueue<Packet> queue = new ConcurrentQueue<Packet>();
 
-        //Handles all packets in the queue
-        public static void HandleQueue()
+        //Handles next packet
+        public static bool HandleNextPacket()
         {
-            lock (queue)
+            Packet packet;
+            if (queue.TryDequeue(out packet))
             {
-                foreach(Packet packet in queue)
-                {
-                    HandleData(packet.sender, packet.data);
-                }
-                queue.Clear();
+                HandleData(packet.sender, packet.data);
+                return true;
+            } else  {
+                return false;
             }
         }
 
@@ -37,7 +40,7 @@ namespace IonServer.Engine.Core.Networking
         {
             lock (queue)
             {
-                queue.Add(new Packet(sender, data));
+                queue.Enqueue(new Packet(sender, data));
             }
         }
 

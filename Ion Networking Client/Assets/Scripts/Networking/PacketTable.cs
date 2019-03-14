@@ -40,15 +40,16 @@ namespace Assets.Scripts.Networking
         //Echo packet
         public static void Echo(byte[] data)
         {
-            
-
             byte lifespan = data[1];
-            Debug.Log("Received echo packet from server with a lifespan of " + lifespan);
+
+            if(lifespan == 0)
+            {
+                Debug.Log("Echo finished");
+            }
 
             if (lifespan > 0)
             {
                 data[1]--;
-                Debug.Log("Sending it back!");
                 NetworkManager.SendToServer(data);
             }
         }
