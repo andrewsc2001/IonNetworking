@@ -81,7 +81,7 @@ namespace IonServer.Engine.Core.Networking
         public void UpdateConfiguration()
         {
             _tcpSocket.SendBufferSize = NetworkManager.ClientSocketSendBufferSize;
-            _tcpSocket.ReceiveBufferSize = NetworkManager.ClientSocketRecieveBufferSize;
+            _tcpSocket.ReceiveBufferSize = NetworkManager.ClientSocketReceiveBufferSize;
             _networkStream = _tcpSocket.GetStream();
             Array.Resize(ref _readBuffer, _tcpSocket.ReceiveBufferSize);
         }
@@ -169,7 +169,7 @@ namespace IonServer.Engine.Core.Networking
         //Shortens the BeginRead line.
         private void BeginRead()
         {
-            _networkStream.BeginRead(_readBuffer, 0, NetworkManager.ClientSocketRecieveBufferSize, OnRecieveData, null);
+            _networkStream.BeginRead(_readBuffer, 0, NetworkManager.ClientSocketReceiveBufferSize, OnRecieveData, null);
         }
 
         public void CloseConnection()

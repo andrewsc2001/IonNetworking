@@ -9,7 +9,7 @@ namespace IonServer.Engine.Core.Networking
         //settings
         public static int Port { get; private set; }
         public static byte MaxPlayers { get; private set; }
-        public static int ClientSocketRecieveBufferSize { get; private set; }
+        public static int ClientSocketReceiveBufferSize { get; private set; }
         public static int ClientSocketSendBufferSize { get; private set; }
         public static bool UseNoDelay { get; private set; }
 
@@ -17,16 +17,16 @@ namespace IonServer.Engine.Core.Networking
 
         private static TcpListener _serverSocket;
 
-        public static void Init()
+        public static void Init(int Port, byte MaxPlayers, int ClientSocketReceiveBufferSize=4096, int ClientSocketSendBufferSize=4096, bool UseNoDelay=false)
         {
             //Networking
             Console.WriteLine("Initializing NetworkManager");
 
-            Port = 35565;
-            MaxPlayers = 4;
-            ClientSocketRecieveBufferSize = 4096;
-            ClientSocketSendBufferSize = 4096;
-            UseNoDelay = false;
+            NetworkManager.Port = Port;
+            NetworkManager.MaxPlayers = MaxPlayers;
+            NetworkManager.ClientSocketReceiveBufferSize = ClientSocketReceiveBufferSize;
+            NetworkManager.ClientSocketSendBufferSize = ClientSocketSendBufferSize;
+            NetworkManager.UseNoDelay = UseNoDelay;
 
             InitClientSlots();//Set up client slots so that connections can be passed off to client objects
         }

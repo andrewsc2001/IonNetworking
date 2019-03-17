@@ -60,15 +60,14 @@ namespace IonServer.Engine.Core.GameLogic
                 }
                 else if (delta > Game.AllottedPacketHandleTime)
                 {
+                    //Process commands and packets before the game update.
+                    CommandManager.HandleQueue();
+
                     if (PacketHandler.HandleNextPacket())
                         continue;
 
                     Thread.Sleep(Game.AllottedPacketHandleTime - 1);
                 }
-
-                //Process commands and packets before the game update.
-                CommandManager.HandleQueue();
-
             }
         }
 

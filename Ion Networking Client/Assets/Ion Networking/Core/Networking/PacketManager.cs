@@ -40,7 +40,7 @@ namespace IonClient.Core.Networking
             if (Locked)
                 return;
 
-            Debug.Log("Finalizing Packet Types");
+            Debug.Log("Finalizing Packet Table");
 
             foreach(DictionaryEntry pair in packetTable)
             {

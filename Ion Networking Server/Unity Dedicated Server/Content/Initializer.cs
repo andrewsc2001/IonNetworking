@@ -7,11 +7,11 @@ namespace IonServer.Content
     {
         public static void Init()
         {
-            NetworkManager.Init();
+            NetworkManager.Init(35565, 4); //Initializes the server on port 35565. MaxPlayers=4
 
-            CoreManager.Init();
+            CoreManager.Init(); //Initializes core content.
 
-            PacketManager.Lock();
+            PacketManager.Lock(); //Locks the PacketManager. 
         }
     }
 }
