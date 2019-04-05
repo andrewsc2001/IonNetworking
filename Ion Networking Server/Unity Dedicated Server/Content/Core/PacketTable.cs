@@ -10,7 +10,7 @@ namespace IonServer.Content.Core
         {
             Console.WriteLine("Initializing Packet Table");
 
-            PacketManager.AddPacket("SyncPacketTable", 0, Empty);
+            PacketManager.AddPacket("SyncPacketTable", 0, null);
             PacketManager.AddPacket("echo", new PacketManager.PacketAction(Echo));
         }
 
@@ -34,8 +34,5 @@ namespace IonServer.Content.Core
                 client.Send(data);
             }
         }
-
-        //Does nothing. Used for packet types that are only sent from the server
-        public static void Empty(byte[] data) { }
     }
 }

@@ -41,7 +41,6 @@ namespace IonClient.Core.Networking
             //If there is no packet type with that header, return.
             if (action == null)
             {
-                Debug.Log("A packet was recieved but no PacketAction could be found! header:" + header);
                 return;
             }
 
