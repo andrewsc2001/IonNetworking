@@ -106,13 +106,6 @@ namespace IonClient.Core.Networking.Tools
             Array.Resize(ref packet, bytes.Length + packet.Length);
 
             Buffer.BlockCopy(bytes, 0, packet, packet.Length - bytes.Length, bytes.Length);
-
-            Console.Write("|");
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                Console.Write(bytes[i] + ", ");
-            }
-            Console.Write("|");
         }
 
         //Adds bytes to the front of the packet (mostly for wrapping already made packets).
