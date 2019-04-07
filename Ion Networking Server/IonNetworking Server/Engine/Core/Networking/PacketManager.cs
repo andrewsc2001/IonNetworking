@@ -38,12 +38,12 @@ namespace IonNetworking_Server.Engine.Core.Networking
         {
             if (Locked)
                 return;
-
-
-
+            
             Console.WriteLine("Finalizing Packet Types");
 
-            foreach(Packet packet in _registerQueue)
+            AddPacket("SyncPacketTable", 0, null);
+
+            foreach (Packet packet in _registerQueue)
             {
                 byte header = GetUnusedHeader();
 
@@ -57,8 +57,7 @@ namespace IonNetworking_Server.Engine.Core.Networking
             Locked = true;
         }
         
-        //Allows dev to specify the header. Useful for initialization that may take place before all PacketTables are loaded on the client.
-        public static void AddPacket(string name, byte header, PacketAction action)
+        private static void AddPacket(string name, byte header, PacketAction action)
         {
             if (Locked)
                 return;

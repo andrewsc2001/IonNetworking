@@ -49,19 +49,19 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>HN3hXDxExUf50gRJGLA4bZp1zAxAI8FH2V5sugKR394=</dsig:DigestValue>
+        <dsig:DigestValue>XYVHXg4OoIbIPO9RFVUGoiTPXrxyJWe4PxooJCFB8w0=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="IonServer.exe" size="8616">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="IonServer.exe" size="8104">
       <assemblyIdentity name="IonServer" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>6UMDRqYpvgzOiA3ebzVoqywcgndzxuPbySHy082OD7A=</dsig:DigestValue>
+        <dsig:DigestValue>nRzpOndlLpIT9PWIegBuj0Tp8ohNLj7l0uoizlX2diA=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

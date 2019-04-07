@@ -10,31 +10,8 @@ namespace Assets.Scripts.Networking
         public void Awake()
         {
             Debug.Log("Initializing Packets");
-
-            PacketManager.AddPacket("SyncPacketTable", 0, SyncPacketTable);
-            PacketManager.AddPacket("echo", Echo);
-        }
-
-        //Takes a packet table from the server and registers it to the local packet table
-        public static void SyncPacketTable(byte[] data)
-        {
-            Debug.Log("Received Packet Table from server");
-
-            Hashtable headersToNames = new Hashtable();
-
-            PacketReader pr = new PacketReader(data);
-            byte lenghtOfPacketTable = pr.ReadByte();
-
-            for (int i = 0; i < lenghtOfPacketTable; i++)
-            {
-                byte header = pr.ReadByte();
-                string name = pr.ReadString();
-
-                headersToNames.Add(header, name);
-            }
-
             
-            PacketManager.Lock(headersToNames);
+            PacketManager.AddPacket("echo", Echo);
         }
 
         //Echo packet

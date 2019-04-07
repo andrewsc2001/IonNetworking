@@ -10,6 +10,10 @@ namespace IonClient.Core
         private void Awake()
         {
             Singleton = this;
+
+            //Adds SyncPacketTable in engine code because it is required for the engine to function.
+            PacketManager.AddPacket("SyncPacketTable", 0, PacketManager.SyncPacketTable);
+
             NetworkManager.Init();
         }
 

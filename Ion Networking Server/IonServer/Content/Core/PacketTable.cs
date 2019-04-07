@@ -8,8 +8,7 @@ namespace IonServer.Content.Core
         public static void Init()
         {
             Console.WriteLine("Initializing Packet Table");
-
-            PacketManager.AddPacket("SyncPacketTable", 0, null);
+            
             PacketManager.AddPacket("echo", new PacketManager.PacketAction(Echo));
         }
 

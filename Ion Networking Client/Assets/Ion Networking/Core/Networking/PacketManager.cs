@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IonClient.Core.Networking.Tools;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -79,7 +80,6 @@ namespace IonClient.Core.Networking
             return null;
         }
 
-        //Allows dev to specify the header. Useful for initialization that may take place before all PacketTables are loaded on the client.
         public static void AddPacket(string name, byte header, PacketAction action)
         {
             if (Locked)
@@ -146,6 +146,28 @@ namespace IonClient.Core.Networking
 
                 return header;
             }
+        }
+
+        //Takes a packet table from the server and registers it to the local packet table
+        public static void SyncPacketTable(byte[] data)
+        {
+            Debug.Log("Received Packet Table from server");
+
+            Hashtable headersToNames = new Hashtable();
+
+            PacketReader pr = new PacketReader(data);
+            byte lenghtOfPacketTable = pr.ReadByte();
+
+            for (int i = 0; i < lenghtOfPacketTable; i++)
+            {
+                byte header = pr.ReadByte();
+                string name = pr.ReadString();
+
+                headersToNames.Add(header, name);
+            }
+
+
+            PacketManager.Lock(headersToNames);
         }
 
         //Used to store packets before they're locked into the register.
