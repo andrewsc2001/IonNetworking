@@ -11,7 +11,7 @@ namespace Assets.Scripts.Networking
         {
             Debug.Log("Initializing Packets");
             
-            PacketManager.AddPacket("echo", Echo);
+            PacketManager.AddPacket("echo", null);
         }
 
         //Echo packet

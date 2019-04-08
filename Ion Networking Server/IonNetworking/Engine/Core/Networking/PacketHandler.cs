@@ -15,21 +15,21 @@ namespace IonNetworking.Engine.Core.Networking
                 this.data = data;
             }
         }
-
-        //private static readonly List<Packet> queue = new List<Packet>();
+        
         private static ConcurrentQueue<Packet> queue = new ConcurrentQueue<Packet>();
 
         //Handles next packet
         public static bool HandleNextPacket()
         {
             Packet packet;
+
             if (queue.TryDequeue(out packet))
             {
                 HandleData(packet.sender, packet.data);
                 return true;
-            } else  {
-                return false;
             }
+
+            return false;
         }
 
         //Queues packets to be handled by another thread
@@ -52,9 +52,7 @@ namespace IonNetworking.Engine.Core.Networking
 
             //If there is no packet type with that header, return.
             if (action == null)
-            {
                 return;
-            }
 
             //Send the data to the packet action.
             action(data);

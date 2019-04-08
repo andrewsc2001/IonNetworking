@@ -16,3 +16,12 @@ C:\Users\techn\Documents\GitHub\IonNetworking\Ion Networking Server\IonNetworkin
 C:\Users\techn\Documents\GitHub\IonNetworking\Ion Networking Server\IonNetworking\obj\Debug\netstandard2.0\IonNetworking.AssemblyInfo.cs
 C:\Users\techn\Documents\GitHub\IonNetworking\Ion Networking Server\IonNetworking\obj\Debug\netstandard2.0\IonNetworking.dll
 C:\Users\techn\Documents\GitHub\IonNetworking\Ion Networking Server\IonNetworking\obj\Debug\netstandard2.0\IonNetworking.pdb
+D:\GitHub\IonNetworking\Ion Networking Server\IonNetworking\obj\Debug\netstandard2.0\IonNetworking.csprojAssemblyReference.cache
+D:\GitHub\IonNetworking\Ion Networking Server\IonNetworking\obj\Debug\netstandard2.0\IonNetworking.csproj.CoreCompileInputs.cache
+D:\GitHub\IonNetworking\Ion Networking Server\IonNetworking\obj\Debug\netstandard2.0\IonNetworking.AssemblyInfoInputs.cache
+D:\GitHub\IonNetworking\Ion Networking Server\IonNetworking\obj\Debug\netstandard2.0\IonNetworking.AssemblyInfo.cs
+D:\GitHub\IonNetworking\Ion Networking Server\IonNetworking\obj\Debug\netstandard2.0\IonNetworking.dll
+D:\GitHub\IonNetworking\Ion Networking Server\IonNetworking\obj\Debug\netstandard2.0\IonNetworking.pdb
+D:\GitHub\IonNetworking\Ion Networking Server\IonNetworking\bin\Debug\netstandard2.0\IonNetworking.deps.json
+D:\GitHub\IonNetworking\Ion Networking Server\IonNetworking\bin\Debug\netstandard2.0\IonNetworking.dll
+D:\GitHub\IonNetworking\Ion Networking Server\IonNetworking\bin\Debug\netstandard2.0\IonNetworking.pdb

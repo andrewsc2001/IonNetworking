@@ -9,11 +9,11 @@ namespace IonClient.Core.Networking
     public static class PacketManager
     {
         private static readonly List<Packet> _registerQueue = new List<Packet>();
-        private static readonly Hashtable _headersToActions = new Hashtable();
-        private static readonly Hashtable _headersToNames = new Hashtable();
-        private static readonly Hashtable _namesToHeaders = new Hashtable();
+        public static Hashtable _headersToActions = new Hashtable();
+        public static Hashtable _headersToNames = new Hashtable();
+        public static Hashtable _namesToHeaders = new Hashtable();
 
-        public static bool Locked { get; private set; }
+        public static bool Locked = false;
 
         public delegate void PacketAction(byte[] data);
 
@@ -21,14 +21,13 @@ namespace IonClient.Core.Networking
         public static void AddPacket(string name, PacketAction action)
         {
             if (Locked)
-                return;
+                throw new InvalidOperationException("Cannot add packet after PacketTable has been locked!");
 
             foreach (Packet packet in _registerQueue)
             {
                 if (packet.name == name)
                 {
-                    Debug.Log("Cannot create duplicate packet type: " + name + "!");
-                    return;
+                    throw new ArgumentException("Cannot register " + packet.name + " packet: Name already taken.");
                 }
             }
 
@@ -39,51 +38,39 @@ namespace IonClient.Core.Networking
         public static void Lock(Hashtable packetTable)
         {
             if (Locked)
-                return;
+                throw new InvalidOperationException("Cannot lock PacketTable after PacketTable has been locked!");
 
             Debug.Log("Finalizing Packet Table");
 
-            foreach(DictionaryEntry pair in packetTable)
+            foreach (DictionaryEntry pair in packetTable)
             {
-                Packet packet = GetQueuedPacket((string)pair.Value);
-                if(packet == null)
-                {
-                    Debug.Log("Server sent a packet with an unrecognized packet name: " + pair.Value + "!");
-                    return;
-                }
+                Packet packet;
+                bool foundPacket = TryFindPacket(out packet, (string)pair.Value);
+                if (!foundPacket)
+                    throw new InvalidOperationException("Server sent PacketTable with unrecognized name: " + (string)pair.Value);
+
                 AddPacket((string)pair.Value, (byte)pair.Key, packet.action);
                 _registerQueue.Remove(packet);
             }
 
+            Console.WriteLine("Finalizing Packet Types");
+            
             if (_registerQueue.Count > 0)
             {
+                //Throw error?
                 Debug.Log("Not all client-registered packets were included in the server packet table!");
-                foreach(Packet packet in _registerQueue)
+                foreach (Packet packet in _registerQueue)
                 {
                     Debug.Log(packet.name);
                 }
             }
-            
+
             Locked = true;
         }
-
-        private static Packet GetQueuedPacket(string name)
-        {
-            foreach (Packet packet in _registerQueue)
-            {
-                if (name == packet.name)
-                {
-                    return packet;
-                }
-            }
-
-            return null;
-        }
-
-        public static void AddPacket(string name, byte header, PacketAction action)
+        private static void AddPacket(string name, byte header, PacketAction action)
         {
             if (Locked)
-                return;
+                throw new InvalidOperationException("Cannot add packet after PacketTable has been locked!");
 
             if (_headersToActions.ContainsKey(header))
             {
@@ -101,10 +88,7 @@ namespace IonClient.Core.Networking
         {
             object action = _headersToActions[header];
 
-            if (action != null)
-                return (PacketAction)action;
-
-            return null;
+            return (PacketAction)action;
         }
 
         //Returns a header from a name
@@ -112,10 +96,10 @@ namespace IonClient.Core.Networking
         {
             object header = _namesToHeaders[name];
 
-            if (header != null)
-                return (byte)header;
+            if (header == null)
+                throw new Exception("No packet with named " + name + "!");
 
-            return 255;
+            return (byte)header;
         }
 
         //Returns a name from a header
@@ -123,29 +107,25 @@ namespace IonClient.Core.Networking
         {
             object name = _headersToNames[header];
 
-            if (name != null)
-                return (string)name;
+            if (name == null)
+                throw new Exception("No packet with header: " + header + "!");
 
-            return null;
+            return (string)name;
         }
 
-        //Returns an unused header.
-        private static byte GetUnusedHeader()
+        private static bool TryFindPacket(out Packet packet, string name)
         {
-            byte header = 1; //Header 0 is reserved for sending PacketTables from the server.
-            while (true)
+            foreach(Packet p in _registerQueue)
             {
-                if (_headersToActions.ContainsKey(header))
+                if(p.name == name)
                 {
-                    if (header == 255)
-                        throw new Exception("Could not find unused header!");
-
-                    header++;
-                    continue;
+                    packet = p;
+                    return true;
                 }
-
-                return header;
             }
+
+            packet = new Packet();
+            return false;
         }
 
         //Takes a packet table from the server and registers it to the local packet table
@@ -170,8 +150,15 @@ namespace IonClient.Core.Networking
             PacketManager.Lock(headersToNames);
         }
 
+        //Adds core engine packets
+        public static void AddEnginePackets()
+        {
+            Debug.Log("Adding Engine Packets");
+            AddPacket("SyncPacketTable", 0, SyncPacketTable);
+        }
+
         //Used to store packets before they're locked into the register.
-        private class Packet
+        private struct Packet
         {
             public string name;
             public PacketAction action;

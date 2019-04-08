@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Text;
 
 namespace IonNetworking.Engine.Core.Networking.Tools

@@ -39,7 +39,7 @@ namespace ExampleServer.Content.Core
             pb.Write(lifespan);
 
             Console.WriteLine("Sending echo packet to client " + clientID + " with lifespan of " + lifespan);
-
+            
             client.Send(pb.GetPacket());
         }
 

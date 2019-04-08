@@ -34,6 +34,8 @@
       "type": "package",
       "path": "microsoft.netcore.platforms/1.1.0",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/netstandard1.0/_._",
@@ -47,6 +49,8 @@
       "type": "package",
       "path": "netstandard.library/2.0.3",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "build/netstandard2.0/NETStandard.Library.targets",
@@ -182,11 +186,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\techn\\Documents\\GitHub\\IonNetworking\\Ion Networking Server\\IonNetworking\\IonNetworking.csproj",
+      "projectUniqueName": "D:\\GitHub\\IonNetworking\\Ion Networking Server\\IonNetworking\\IonNetworking.csproj",
       "projectName": "IonNetworking",
-      "projectPath": "C:\\Users\\techn\\Documents\\GitHub\\IonNetworking\\Ion Networking Server\\IonNetworking\\IonNetworking.csproj",
+      "projectPath": "D:\\GitHub\\IonNetworking\\Ion Networking Server\\IonNetworking\\IonNetworking.csproj",
       "packagesPath": "C:\\Users\\techn\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\techn\\Documents\\GitHub\\IonNetworking\\Ion Networking Server\\IonNetworking\\obj\\",
+      "outputPath": "D:\\GitHub\\IonNetworking\\Ion Networking Server\\IonNetworking\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

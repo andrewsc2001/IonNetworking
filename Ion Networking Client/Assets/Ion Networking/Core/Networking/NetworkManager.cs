@@ -16,7 +16,8 @@ namespace IonClient.Core.Networking
         public static bool isConnected;
 
         //Network Objects
-        private static TcpClient _tcpSocket;
+        public static TcpClient Socket { get; private set; }
+
         private static NetworkStream _networkStream;
         private static StreamReader _streamReader;
         private static StreamWriter _streamWriter;
@@ -36,23 +37,21 @@ namespace IonClient.Core.Networking
         private static void ConfigureTCP()
         {
             //Configure Socket
-            _tcpSocket = new TcpClient();
-            _tcpSocket.ReceiveBufferSize = 4096;
-            _tcpSocket.SendBufferSize = 4096;
-            _tcpSocket.NoDelay = false;
+            Socket = new TcpClient();
+            Socket.ReceiveBufferSize = 4096;
+            Socket.SendBufferSize = 4096;
+            Socket.NoDelay = false;
             Array.Resize(ref asyncBuff, 8192);
         }
 
         public static void Connect(string IP, int PORT)
         {
-            if (_tcpSocket.Connected || isConnected)
-            {
+            if (Socket.Connected || isConnected)
                 throw new InvalidOperationException("Cannot Connect to Server: Already Connected!");
-            }
 
             //Connect to Server
             Debug.Log("Connecting...");
-            _tcpSocket.BeginConnect(IP, PORT, new AsyncCallback(OnConnected), _tcpSocket);
+            Socket.BeginConnect(IP, PORT, new AsyncCallback(OnConnected), Socket);
 
         }
 
@@ -60,10 +59,10 @@ namespace IonClient.Core.Networking
 
         private static void OnConnected(IAsyncResult result)
         {
-            if (_tcpSocket != null)
+            if (Socket != null)
             {
-                _tcpSocket.EndConnect(result);
-                if (_tcpSocket.Connected == false)
+                Socket.EndConnect(result);
+                if (Socket.Connected == false)
                 {
                     isConnected = false;
                     Debug.Log("Connection Failed.");
@@ -72,8 +71,8 @@ namespace IonClient.Core.Networking
                 else
                 {
                     Debug.Log("Connected to Game Server!");
-                    _tcpSocket.NoDelay = true;
-                    _networkStream = _tcpSocket.GetStream();
+                    Socket.NoDelay = true;
+                    _networkStream = Socket.GetStream();
                     _networkStream.BeginRead(asyncBuff, 0, 8192, OnRecieve, null);
                     isConnected = true;
                     NetworkController.Singleton.OnConnected();
@@ -83,7 +82,7 @@ namespace IonClient.Core.Networking
 
         private static void OnRecieve(IAsyncResult result)
         {
-            if (_tcpSocket != null)
+            if (Socket != null)
             {
                 int byteArray = _networkStream.EndRead(result);
                 byte[] RawData = null;
@@ -93,14 +92,12 @@ namespace IonClient.Core.Networking
                 if (byteArray == 0)
                 {
                     Debug.Log("You were disconnected from the server.");
-                    _tcpSocket.Close();
+                    Socket.Close();
                     return;
                 }
 
-                if (_tcpSocket == null)
-                {
+                if (Socket == null)
                     return;
-                }
 
                 _networkStream.BeginRead(asyncBuff, 0, 8192, OnRecieve, null);
 
@@ -120,32 +117,25 @@ namespace IonClient.Core.Networking
         //Sends data to the server over TCP.
         public static void SendToServer(byte[] data)
         {
-            if (_tcpSocket != null)
-            {
-                if (_tcpSocket.Connected)
-                {
-                    if (_networkStream != null)
-                    {
-                        byte length = (byte)(data.Length + 1);
+            if (Socket == null)
+                throw new InvalidOperationException("Cannot send data when Socket has not been initialized!");
 
-                        byte[] send = new byte[data.Length + 1];
-                        send[0] = length;
-                        for (int index = 0; index < data.Length; index++)
-                        {
-                            send[index + 1] = data[index];
-                        }
+            if (data.Length > Socket.SendBufferSize)
+                throw new ArgumentException("Cannot send data block larger than Socket.SendBufferSize!");
 
-                        _networkStream.Write(send, 0, send.Length);
-                        return;
-                    }
-                    Debug.LogError("Tried to send data to server, but the stream was null!");
-                    return;
-                }
-                Debug.LogError("Tried to send data to server, but Socket is not connected!");
-                return;
-            }
-            Debug.LogError("Tried to send data to server, but Socket is null!");
-            return;
+            if (!Socket.Connected)
+                throw new InvalidOperationException("Cannot send data when not connected!");
+
+            if (_networkStream == null)
+                throw new InvalidOperationException("Cannot send data when _networkStream is null!");
+
+            //Add length of packet to beginning of it. This allows the client to separate two packets if they get stuck together.
+            byte[] send = new byte[data.Length + 1];
+
+            send[0] = (byte)(data.Length + 1);
+            Buffer.BlockCopy(data, 0, send, 1, data.Length);
+
+            _networkStream.Write(send, 0, send.Length);
         }
     }
 }
