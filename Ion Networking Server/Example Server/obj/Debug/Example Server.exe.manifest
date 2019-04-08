@@ -49,19 +49,19 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>kzp2bXueHrEXGVt4gdTNgFXMPy+NPWok9dy8lMOeV10=</dsig:DigestValue>
+        <dsig:DigestValue>bWMUJWQ7DQb3jNNYKf1Fpo/0TwKdMKZTma5ElNVDTtw=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="IonNetworking.dll" size="22016">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="IonNetworking.dll" size="23040">
       <assemblyIdentity name="IonNetworking" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>dg73hvQOx5rgla5kBxc0rTWwe/zsXK1Y8aoNDzix9ts=</dsig:DigestValue>
+        <dsig:DigestValue>TKLSKdUgisGUF1l0DQQPhJ0CPEr0Ym6sQpm1PIUEE74=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

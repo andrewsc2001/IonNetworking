@@ -47,8 +47,7 @@ namespace IonClient.Core.Networking
         {
             if (_tcpSocket.Connected || isConnected)
             {
-                Debug.LogError("Already connected!");
-                return; //Already connected
+                throw new InvalidOperationException("Cannot Connect to Server: Already Connected!");
             }
 
             //Connect to Server

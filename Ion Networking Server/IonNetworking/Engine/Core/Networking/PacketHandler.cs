@@ -6,10 +6,10 @@ namespace IonNetworking.Engine.Core.Networking
     {
         private struct Packet
         {
-            public Client sender;
+            public IonClient sender;
             public byte[] data;
 
-            public Packet(Client sender, byte[] data)
+            public Packet(IonClient sender, byte[] data)
             {
                 this.sender = sender;
                 this.data = data;
@@ -33,7 +33,7 @@ namespace IonNetworking.Engine.Core.Networking
         }
 
         //Queues packets to be handled by another thread
-        public static void QueuePacket(Client sender, byte[] data)
+        public static void QueuePacket(IonClient sender, byte[] data)
         {
             lock (queue)
             {
@@ -42,7 +42,7 @@ namespace IonNetworking.Engine.Core.Networking
         }
 
         //Take data and route it to the correct packet type to be processed.
-        private static void HandleData(Client client, byte[] data)
+        private static void HandleData(IonClient client, byte[] data)
         {
             byte header = data[0]; //Header: first packet used for identifying the purpose of the packet.
             data[0] = client.Index;

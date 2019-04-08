@@ -15,7 +15,7 @@ namespace ExampleServer.Content.Core
         //Echo packet
         public static void Echo(byte[] data)
         {
-            Client client = NetworkManager.GetClientFromIndex(data[0]);
+            IonClient client = NetworkManager.GetClientFromIndex(data[0]);
             
             data[0] = PacketManager.GetHeader("echo");
 

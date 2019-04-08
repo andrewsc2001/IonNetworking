@@ -33,7 +33,7 @@ namespace ExampleServer.Content.Core
             byte.TryParse(arguments[1], out clientID);
             byte.TryParse(arguments[2], out lifespan);
 
-            Client client = NetworkManager.GetClientFromIndex(clientID);
+            IonClient client = NetworkManager.GetClientFromIndex(clientID);
 
             PacketBuilder pb = new PacketBuilder("echo");
             pb.Write(lifespan);
@@ -61,7 +61,7 @@ namespace ExampleServer.Content.Core
                 return;
             }
 
-            Client client = NetworkManager.GetClientFromIndex((byte)index);
+            IonClient client = NetworkManager.GetClientFromIndex((byte)index);
 
             if(client == null)
             {

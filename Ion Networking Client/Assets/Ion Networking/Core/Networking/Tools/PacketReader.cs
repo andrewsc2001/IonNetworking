@@ -13,15 +13,25 @@ namespace IonClient.Core.Networking.Tools
 
         public PacketReader(byte[] data)
         {
-            LoadPacket(data);
+            try
+            {
+                LoadPacket(data);
+            }
+            catch (ArgumentNullException e)
+            {
+                throw new ArgumentNullException(e.Message);
+            }
         }
 
         //Loads a packet into the reader
         public void LoadPacket(byte[] packet)
         {
+            if(packet == null)
+                throw new ArgumentNullException("Cannot load null packet!");
+
             loadedPacket = packet;
         }
-        
+
         //Clears the current packet
         public void Clear()
         {
@@ -31,6 +41,9 @@ namespace IonClient.Core.Networking.Tools
         //Sets the cursor
         public void SetCursor(int cursor)
         {
+            if (cursor < 0)
+                throw new ArgumentOutOfRangeException("Cursor cannot be less than 0!");
+
             this.cursor = cursor;
         }
 
@@ -38,7 +51,8 @@ namespace IonClient.Core.Networking.Tools
         public int GetRemainingLength()
         {
             if (loadedPacket == null)
-                return 0;
+                throw new InvalidOperationException("Cannot calculate remaining length with no packet loaded!");
+
             return loadedPacket.Length - cursor;
         }
 
@@ -47,84 +61,206 @@ namespace IonClient.Core.Networking.Tools
         //Read an sbyte
         public sbyte ReadSByte()
         {
-            return (sbyte)ReadByte();
+            try
+            {
+                return (sbyte)ReadByte();
+            }
+            catch (InvalidOperationException e)
+            {
+                throw e;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                throw e;
+            }
         }
 
         //Read a short
         public short ReadShort()
         {
-            return BitConverter.ToInt16(ReadBytes(2), 0);
+            try
+            {
+                return BitConverter.ToInt16(ReadBytes(2), 0);
+            }
+            catch (InvalidOperationException e)
+            {
+                throw e;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                throw e;
+            }
         }
 
         //Read a ushort
         public ushort ReadUShort()
         {
-            return (ushort)ReadShort();
+            try
+            {
+                return (ushort)ReadShort();
+            }
+            catch (InvalidOperationException e)
+            {
+                throw e;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                throw e;
+            }
         }
 
         //Read an int
         public int ReadInt()
         {
-            return BitConverter.ToInt32(ReadBytes(4), 0);
+            try
+            {
+                return BitConverter.ToInt32(ReadBytes(4), 0);
+            }
+            catch (InvalidOperationException e)
+            {
+                throw e;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                throw e;
+            }
         }
 
         //Read a uint
         public uint ReadUInt()
         {
-            return (uint)ReadInt();
+            try
+            {
+                return (uint)ReadInt();
+            }
+            catch (InvalidOperationException e)
+            {
+                throw e;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                throw e;
+            }
         }
 
         //Read a long
         public long ReadLong()
         {
-            return BitConverter.ToInt64(ReadBytes(8), 0);
+            try
+            {
+                return BitConverter.ToInt64(ReadBytes(8), 0);
+            }
+            catch (InvalidOperationException e)
+            {
+                throw e;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                throw e;
+            }
         }
 
         //Read a ulong
         public ulong ReadULong()
         {
-            return (ulong)ReadLong();
+            try
+            {
+                return (ulong)ReadLong();
+            }
+            catch (InvalidOperationException e)
+            {
+                throw e;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                throw e;
+            }
         }
 
         //Read a float
         public float ReadFloat()
         {
-            return BitConverter.ToSingle(ReadBytes(4), 0);
+            try
+            {
+                return BitConverter.ToSingle(ReadBytes(4), 0);
+            }
+            catch (InvalidOperationException e)
+            {
+                throw e;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                throw e;
+            }
         }
 
         //Read a double
         public double ReadDouble()
         {
-            return BitConverter.ToDouble(ReadBytes(8), 0);
+            try
+            {
+                return BitConverter.ToDouble(ReadBytes(8), 0);
+            }
+            catch (InvalidOperationException e)
+            {
+                throw e;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                throw e;
+            }
         }
 
         //Read a char
         public char ReadChar()
         {
-            return BitConverter.ToChar(ReadBytes(2), 0);
+            try
+            {
+                return BitConverter.ToChar(ReadBytes(2), 0);
+            }
+            catch (InvalidOperationException e)
+            {
+                throw e;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                throw e;
+            }
         }
 
         //Read a string
         public string ReadString()
         {
-            int length = ReadInt();
+            try
+            {
+                int length = ReadInt();
 
-            return Encoding.UTF8.GetString(ReadBytes(length));
+                return Encoding.UTF8.GetString(ReadBytes(length));
+            }
+            catch (InvalidOperationException e)
+            {
+                throw e;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                throw e;
+            }
         }
 
         //Read a bool
         public bool ReadBool()
         {
-            byte read = ReadByte();
-
-            if (read == 0)
-                return false;
-            else if (read == 1)
-                return true;
-            else
+            try
             {
-                Console.WriteLine("Tried to read bool from packet but found " + read);
-                return false;
+                return BitConverter.ToBoolean(ReadBytes(1), 0);
+            }
+            catch (InvalidOperationException e)
+            {
+                throw e;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                throw e;
             }
         }
 
@@ -134,10 +270,7 @@ namespace IonClient.Core.Networking.Tools
         public byte ReadByte()
         {
             if (loadedPacket == null)
-            {
-                Console.WriteLine("Cannot read from null packet!");
-                return 0;
-            }
+                throw new InvalidOperationException("Cannot read from null packet!");
 
             cursor++;
             return loadedPacket[cursor - 1];
@@ -146,16 +279,19 @@ namespace IonClient.Core.Networking.Tools
         //Returns a byte[] read from the packet.
         public byte[] ReadBytes(int length)
         {
-            if(length <= 0 || length > GetRemainingLength())
-            {
-                Console.WriteLine("Length out of bounds!");
-                return null;
-            }
+            if (loadedPacket == null)
+                throw new InvalidOperationException("Cannot read from null packet!");
+
+            if (length < 1)
+                throw new ArgumentOutOfRangeException("Length cannot be less than 1!");
+
+            if (length > GetRemainingLength())
+                throw new ArgumentOutOfRangeException("Cannot read past end of packet!");
 
             byte[] read = new byte[length];
 
             Buffer.BlockCopy(loadedPacket, cursor, read, 0, length);
-            
+
             cursor += length;
             return read;
         }

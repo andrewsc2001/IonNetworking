@@ -15,7 +15,7 @@ namespace IonNetworking.Engine.Core.CommandLine
         public static void AddCommand(string keyword, CommandAction action)
         {
             if (_commandList.ContainsKey(keyword))
-                return;
+                throw new ArgumentException(keyword + " command has already been added!");
 
             _commandList.Add(keyword, action);
         }
@@ -29,14 +29,19 @@ namespace IonNetworking.Engine.Core.CommandLine
         //returns the command action for a keyword
         private static CommandAction GetCommandAction(string keyword)
         {
-            return (CommandAction)_commandList[keyword];
+            CommandAction command = (CommandAction)_commandList[keyword];
+
+            if (command == null)
+                throw new ArgumentException("No command exists with keyword: " + keyword);
+
+            return command;
         }
 
         //Parses a command and then queues it
         public static string[] ParseCommand(string raw)
         {
             if (string.IsNullOrWhiteSpace(raw))
-                return null;
+                throw new ArgumentException("Cannot parse null or whitespace input!");
 
             return raw.Split(' ');
         }
@@ -45,7 +50,7 @@ namespace IonNetworking.Engine.Core.CommandLine
         public static void QueueCommand(string[] arguments)
         {
             if (arguments == null)
-                return;
+                throw new ArgumentNullException("Cannot handle null arguments!");
 
             lock (_queue)
             {
@@ -69,24 +74,17 @@ namespace IonNetworking.Engine.Core.CommandLine
         //Routes arguments to the correct commands
         private static void HandleArguments(string[] arguments)
         {
+            CommandAction action;
             try
             {
-                CommandAction action = GetCommandAction(arguments[0]);
-
-                if (action == null)
-                {
-                    Console.WriteLine("Unrecognized command '" + arguments[0] + "'");
-                    return;
-                }
-
-                action(arguments);
+                action = GetCommandAction(arguments[0]);
             }
-            catch(Exception e)
+            catch(ArgumentException e)
             {
-                Console.Error.WriteLine(e.Message);
-                Console.Error.WriteLine(e.StackTrace);
-                return;
+                throw new ArgumentException(e.Message);
             }
+
+            action(arguments);
         }
     }
 }

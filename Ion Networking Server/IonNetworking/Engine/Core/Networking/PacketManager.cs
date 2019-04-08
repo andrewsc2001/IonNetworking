@@ -19,14 +19,13 @@ namespace IonNetworking.Engine.Core.Networking
         public static void AddPacket(string name, PacketAction action)
         {
             if (Locked)
-                return;
+                throw new InvalidOperationException("Cannot add packet after PacketTable has been locked!");
 
             foreach(Packet packet in _registerQueue)
             {
                 if(packet.name == name)
                 {
-                    Console.WriteLine("Cannot create duplicate packet type: " + name + "!");
-                    return;
+                    throw new ArgumentException("Cannot register " + packet.name + " packet: Name already taken.");
                 }
             }
 
@@ -37,8 +36,8 @@ namespace IonNetworking.Engine.Core.Networking
         public static void Lock()
         {
             if (Locked)
-                return;
-            
+                throw new InvalidOperationException("Cannot lock PacketTable after PacketTable has been locked!");
+
             Console.WriteLine("Finalizing Packet Types");
 
             AddPacket("SyncPacketTable", 0, null);
@@ -60,7 +59,7 @@ namespace IonNetworking.Engine.Core.Networking
         private static void AddPacket(string name, byte header, PacketAction action)
         {
             if (Locked)
-                return;
+                throw new InvalidOperationException("Cannot add packet after PacketTable has been locked!");
 
             if (_headersToActions.ContainsKey(header))
             {

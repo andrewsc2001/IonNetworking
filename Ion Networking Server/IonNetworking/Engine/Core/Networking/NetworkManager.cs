@@ -9,24 +9,29 @@ namespace IonNetworking.Engine.Core.Networking
         //settings
         public static int Port { get; private set; }
         public static byte MaxPlayers { get; private set; }
-        public static int ClientSocketReceiveBufferSize { get; private set; }
-        public static int ClientSocketSendBufferSize { get; private set; }
-        public static bool UseNoDelay { get; private set; }
+        public static int DefaultReceiveBufferSize { get; private set; }
+        public static int DefaultSendBufferSize { get; private set; }
+        public static bool DefaultUseNoDelay { get; private set; }
 
-        private static Client[] _clientsList;
+        private static IonClient[] _clientsList;
 
         private static TcpListener _serverSocket;
 
-        public static void Init(int Port, byte MaxPlayers, int ClientSocketReceiveBufferSize=4096, int ClientSocketSendBufferSize=4096, bool UseNoDelay=false)
+        public static void Init(int Port, byte MaxPlayers, int DefaultReceiveBufferSize=4096, int DefaultSendBufferSize=4096, bool DefaultUseNoDelay=false)
         {
+            if (Port < 0)
+                throw new ArgumentOutOfRangeException("Invalid Port Number");
+            if (Port < 1024)
+                throw new ArgumentOutOfRangeException("Ports 0-1023 are reserved for system use");
+
             //Networking
             Console.WriteLine("Initializing NetworkManager");
 
             NetworkManager.Port = Port;
             NetworkManager.MaxPlayers = MaxPlayers;
-            NetworkManager.ClientSocketReceiveBufferSize = ClientSocketReceiveBufferSize;
-            NetworkManager.ClientSocketSendBufferSize = ClientSocketSendBufferSize;
-            NetworkManager.UseNoDelay = UseNoDelay;
+            NetworkManager.DefaultReceiveBufferSize = DefaultReceiveBufferSize;
+            NetworkManager.DefaultSendBufferSize = DefaultSendBufferSize;
+            NetworkManager.DefaultUseNoDelay = DefaultUseNoDelay;
 
             InitClientSlots();//Set up client slots so that connections can be passed off to client objects
         }
@@ -41,7 +46,7 @@ namespace IonNetworking.Engine.Core.Networking
             //Disconnect all clients
             for (byte index = 0; index < MaxPlayers; index++)
             {
-                Client client = GetClientFromIndex(index);
+                IonClient client = GetClientFromIndex(index);
                 
                 if(client.Connected)
                 {
@@ -54,17 +59,17 @@ namespace IonNetworking.Engine.Core.Networking
         private static void InitClientSlots() //Initializes client slots so that they can be filled with connections.
         {
             Console.WriteLine("Initializing Client Objects");
-            _clientsList = new Client[MaxPlayers];
+            _clientsList = new IonClient[MaxPlayers];
             for (int i = 0; i < MaxPlayers; i++)
             {
-                _clientsList[i] = new Client();
+                _clientsList[i] = new IonClient();
             }
         }
 
         //////////////////Public Methods
 
         //Returns a client by its endpoint
-        public static Client GetClientFromEndPoint(IPEndPoint ep) //Used primarily by OnUDPRecieve to determine the sender.
+        public static IonClient GetClientFromEndPoint(IPEndPoint ep) //Used primarily by OnUDPRecieve to determine the sender.
         {
             for (int i = 0; i < MaxPlayers; i++)
             {
@@ -80,10 +85,10 @@ namespace IonNetworking.Engine.Core.Networking
         }
 
         //Returns a client object by its Index
-        public static Client GetClientFromIndex(byte Index)
+        public static IonClient GetClientFromIndex(byte Index)
         {
             if (Index < 0 || Index > MaxPlayers)
-                return null;
+                throw new ArgumentOutOfRangeException("Index is out of range!");
 
             lock (_clientsList)
             {
@@ -95,10 +100,7 @@ namespace IonNetworking.Engine.Core.Networking
         public static void StartListener() //Starts _listener thread to wait for connections
         {
             if (!PacketManager.Locked)
-            {
-                Console.WriteLine("Cannot start listener until PacketManager has been locked!");
-                return;
-            }
+                throw new InvalidOperationException("Cannot start listening for clients until PacketManager is locked!");
 
             Console.WriteLine("Starting ServerSocket");
 
@@ -111,6 +113,9 @@ namespace IonNetworking.Engine.Core.Networking
         //Stops listening for new connections
         public static void StopListener() //Stops _listener so no NEW clients can connect
         {
+            if (_serverSocket == null)
+                throw new InvalidOperationException("Can't stop listening when server is not listening for clients!");
+
             Console.WriteLine("Stopping ServerSocket");
             _serverSocket.Stop();
             _serverSocket = null;
@@ -119,7 +124,7 @@ namespace IonNetworking.Engine.Core.Networking
         //////////////////Change settings
 
         //Changes the port that the server listens on
-        public static void SetPort(int port)
+        public static void SetPort(int Port)
         {
             if(_serverSocket != null)//Server is already listening, can't change ports.
             {
@@ -127,59 +132,17 @@ namespace IonNetworking.Engine.Core.Networking
                 return;
             }
 
-            NetworkManager.Port = port;
+            NetworkManager.Port = Port;
         }
 
         //Changes the maximum number of players
         public static void SetMaxPlayers(byte MaxPlayers)
         {
-            if(_serverSocket != null)
-            {
-                Console.WriteLine("Cannot change the maximum number of players while the server is running!");
-                return;
-            }
+            if (_serverSocket != null)
+                throw new InvalidOperationException("Cannot change MaxPlayers while server is open!");
 
             NetworkManager.MaxPlayers = MaxPlayers;
             InitClientSlots();
-        }
-
-        //Set the read buffer for clients
-        public static void SetClientSocketReceiveBufferSize(int size)
-        {
-            if (_serverSocket != null)
-            {
-                Console.WriteLine("Cannot change client read buffer size while the server is running!");
-                return;
-            }
-
-            for (int index = 0; index < MaxPlayers; index++)
-            {
-                _clientsList[index].UpdateConfiguration();
-            }
-        }
-
-        //Set the write buffer for clients
-        public static void SetClientSocketWriteBufferSize(int size)
-        {
-            if (_serverSocket != null)
-            {
-                Console.WriteLine("Cannot change client write buffer size while the server is running!");
-                return;
-            }
-
-            for (int index = 0; index < MaxPlayers; index++)
-            {
-                _clientsList[index].UpdateConfiguration();
-            }
-        }
-
-        //Set NoDelay for all clients
-        public static void SetUseNoDelay(bool NoDelay)
-        {
-            for(int index = 0; index < MaxPlayers; index++)
-            {
-                _clientsList[index].SetUseNoDelay(NoDelay);
-            }
         }
 
         //////////////////Networking/Async Methods
@@ -200,7 +163,7 @@ namespace IonNetworking.Engine.Core.Networking
                     if (!_clientsList[i].Connected) //If client has no connection
                     {
                         Console.WriteLine("Incoming Connection from " + _clientsList[i].IP + " || Index: " + i);
-                        _clientsList[i].Start(i, client.Client.RemoteEndPoint.ToString().Split(':')[0], UseNoDelay, client); //Client has been configured and is ready to communicate.
+                        _clientsList[i].Start(i, client.Client.RemoteEndPoint.ToString().Split(':')[0], DefaultUseNoDelay, client); //Client has been configured and is ready to communicate.
                         
                         return; //Prevents a single connection from taking more than one Client.
                     }
